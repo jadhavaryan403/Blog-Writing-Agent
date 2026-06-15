@@ -1,0 +1,35 @@
+# Core
+fastapi
+uvicorn[standard]
+python-multipart
+httpx
+
+# Database
+sqlalchemy[asyncio]
+asyncpg
+psycopg2-binary
+alembic
+
+# Auth
+python-jose[cryptography]
+passlib[bcrypt]
+
+# AI / LangGraph
+langchain
+langchain-groq
+langchain-community
+langgraph
+langsmith
+
+# Tools
+tavily-python
+google-search-results   # SerpAPI
+
+# Validation / Utils
+pydantic
+pydantic-settings
+python-dotenv
+aiofiles
+
+# Observability
+structlog

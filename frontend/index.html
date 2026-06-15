@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Blog Platform</title>
+  <link rel="stylesheet" href="static/css/main.css" />
+</head>
+<body>
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center">
+      <div style="font-size:2rem;font-weight:700;background:linear-gradient(135deg,#6c63ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">
+        ✦ BlogAI
+      </div>
+      <p style="color:var(--text-muted);font-size:.9rem">Redirecting…</p>
+    </div>
+  </div>
+  <script src="static/js/api.js"></script>
+  <script>
+    if (Auth.isLoggedIn()) {
+      window.location.href = 'pages/dashboard.html';
+    } else {
+      window.location.href = 'pages/login.html';
+    }
+  </script>
+</body>
+</html>

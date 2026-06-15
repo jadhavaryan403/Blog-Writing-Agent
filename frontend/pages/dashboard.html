@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — AI Blog Platform</title>
+  <link rel="stylesheet" href="../static/css/main.css" />
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">✦ BlogAI</div>
+      <div class="logo-sub">Generation Platform</div>
+    </div>
+
+    <nav>
+      <a class="nav-item active" href="dashboard.html">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="create.html">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        New Blog
+      </a>
+      <a class="nav-item" href="settings.html">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-pill" id="sidebar-user" onclick="logout()">
+        <div class="avatar" id="user-avatar">?</div>
+        <div style="overflow:hidden">
+          <div class="user-name" style="font-size:.85rem;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading…</div>
+          <div class="user-email" style="font-size:.73rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
+  <main class="main-content">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+      <div>
+        <h1 style="font-size:1.6rem">Dashboard</h1>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-top:4px">Overview of your blog generation activity</p>
+      </div>
+      <a href="create.html" class="btn btn-primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        New Blog
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-blogs">—</div>
+        <div class="stat-label">Total Blogs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-tokens">—</div>
+        <div class="stat-label">Tokens Used</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-cost">—</div>
+        <div class="stat-label">Total Cost</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-latency">—</div>
+        <div class="stat-label">Avg Generation Time</div>
+      </div>
+    </div>
+
+    <!-- Recent Blogs -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Recent Blogs</h3>
+        <a href="create.html" class="btn btn-secondary btn-sm">Generate New</a>
+      </div>
+
+      <div id="blogs-container">
+        <div style="text-align:center;padding:40px">
+          <span class="spinner"></span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../static/js/api.js"></script>
+<script>
+  guardAuth();
+
+  async function loadDashboard() {
+    // Load user info
+    try {
+      const user = await API.me();
+      document.getElementById('user-avatar').textContent = user.name[0].toUpperCase();
+      document.querySelector('.user-name').textContent  = user.name;
+      document.querySelector('.user-email').textContent = user.email;
+    } catch {}
+
+    // Load usage metrics
+    try {
+      const usage = await API.usage();
+      document.getElementById('stat-tokens').textContent  = formatTokens(usage.total_tokens);
+      document.getElementById('stat-cost').textContent    = formatCost(usage.total_cost);
+      document.getElementById('stat-latency').textContent = usage.average_latency
+        ? `${usage.average_latency.toFixed(1)}s` : '—';
+    } catch {}
+
+    // Load blogs
+    try {
+      const data = await API.listBlogs();
+      document.getElementById('stat-blogs').textContent = data.total;
+      renderBlogs(data.items);
+    } catch (err) {
+      document.getElementById('blogs-container').innerHTML =
+        `<p style="color:var(--error);padding:20px">${err.message}</p>`;
+    }
+  }
+
+  function renderBlogs(blogs) {
+    const el = document.getElementById('blogs-container');
+    if (!blogs.length) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h3 style="color:var(--text-primary);margin-bottom:8px">No blogs yet</h3>
+          <p style="margin-bottom:20px">Generate your first AI-powered blog post.</p>
+          <a href="create.html" class="btn btn-primary">Get Started</a>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Title / Topic</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${blogs.map(b => `
+              <tr>
+                <td>
+                  <div style="font-weight:500;color:var(--text-primary)">${b.title || '(Untitled)'}</div>
+                  <div style="font-size:.8rem;color:var(--text-muted)">${b.topic}</div>
+                </td>
+                <td>${statusBadge(b.status)}</td>
+                <td>${formatDate(b.created_at)}</td>
+                <td>
+                  <div style="display:flex;gap:8px">
+                    ${b.status === 'completed'
+                      ? `<a href="viewer.html?id=${b.id}" class="btn btn-secondary btn-sm">View</a>`
+                      : b.status === 'awaiting_approval'
+                        ? `<a href="approval.html?blog_id=${b.id}" class="btn btn-primary btn-sm">Approve Plan</a>`
+                        : b.status === 'running'
+                          ? `<a href="approval.html?blog_id=${b.id}" class="btn btn-secondary btn-sm">Track</a>`
+                          : ''}
+                    <button onclick="deleteBlog(${b.id}, this)" class="btn btn-danger btn-sm">Delete</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  async function deleteBlog(id, btn) {
+    if (!confirm('Delete this blog? This cannot be undone.')) return;
+    btn.disabled = true;
+    try {
+      await API.deleteBlog(id);
+      Toast.success('Blog deleted');
+      loadDashboard();
+    } catch (err) {
+      Toast.error(err.message);
+      btn.disabled = false;
+    }
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>

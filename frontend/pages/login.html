@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — AI Blog Platform</title>
+  <link rel="stylesheet" href="../static/css/main.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+        </div>
+        <h2 style="color:var(--text-primary);margin-bottom:4px">Welcome back</h2>
+        <p style="font-size:.85rem;color:var(--text-muted)">Sign in to your AI Blog Platform</p>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-top:8px" id="submit-btn">
+          Sign in
+        </button>
+      </form>
+
+      <p style="text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted)">
+        Don't have an account?
+        <a href="register.html">Create one</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="../static/js/api.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+      try {
+        const tokens = await API.login({
+          email:    document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value,
+        });
+        Auth.save(tokens);
+        Toast.success('Welcome back!');
+        setTimeout(() => window.location.href = 'dashboard.html', 500);
+      } catch (err) {
+        Toast.error(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+  </script>
+</body>
+</html>

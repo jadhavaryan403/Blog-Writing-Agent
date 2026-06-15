@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Viewer — AI Blog Platform</title>
+  <link rel="stylesheet" href="../static/css/main.css" />
+  <style>
+    .viewer-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 960px) { .viewer-layout { grid-template-columns: 1fr; } }
+    .meta-panel {
+      position: sticky;
+      top: 24px;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+    }
+    .meta-row:last-child { border-bottom: none; }
+    .meta-key { color: var(--text-muted); }
+    .meta-val { color: var(--text-primary); font-weight: 500; }
+    .citation-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .82rem;
+    }
+    .citation-item:last-child { border-bottom: none; }
+    .citation-item a { word-break: break-all; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">✦ BlogAI</div>
+      <div class="logo-sub">Generation Platform</div>
+    </div>
+    <nav>
+      <a class="nav-item" href="dashboard.html">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="create.html">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        New Blog
+      </a>
+      <a class="nav-item" href="settings.html">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-pill" onclick="logout()">
+        <div class="avatar" id="user-avatar">?</div>
+        <div style="overflow:hidden">
+          <div class="user-name" style="font-size:.85rem;font-weight:500;color:var(--text-primary)">…</div>
+          <div class="user-email" style="font-size:.73rem;color:var(--text-muted)"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- Toolbar -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <a href="dashboard.html" class="btn btn-secondary btn-sm">
+        ← Back
+      </a>
+      <div id="blog-status-badge"></div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" id="copy-btn" onclick="copyMarkdown()">Copy Markdown</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleRaw()">Toggle Raw</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" style="text-align:center;padding:80px">
+      <span class="spinner" style="width:36px;height:36px;border-width:3px"></span>
+    </div>
+
+    <!-- Content -->
+    <div id="content" style="display:none">
+      <div class="viewer-layout">
+
+        <!-- Blog body -->
+        <div>
+          <div class="card">
+            <!-- Rendered markdown view -->
+            <div id="markdown-view" class="markdown-body"></div>
+            <!-- Raw markdown view (hidden by default) -->
+            <pre id="raw-view" style="display:none;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow-x:auto;font-family:var(--font-mono);font-size:.82rem;white-space:pre-wrap;color:var(--text-secondary)"></pre>
+          </div>
+        </div>
+
+        <!-- Metadata panel -->
+        <div class="meta-panel">
+          <!-- Blog info -->
+          <div class="card" style="margin-bottom:16px">
+            <h4 style="margin-bottom:12px;font-size:.9rem;color:var(--text-primary)">Blog Info</h4>
+            <div id="meta-rows"></div>
+          </div>
+
+          <!-- Citations -->
+          <div class="card" id="citations-card" style="display:none">
+            <h4 style="margin-bottom:12px;font-size:.9rem;color:var(--text-primary)">
+              References <span id="citation-count" style="color:var(--text-muted);font-weight:400"></span>
+            </h4>
+            <div id="citations-list"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="../static/js/api.js"></script>
+<script>
+  guardAuth();
+
+  const blogId = new URLSearchParams(window.location.search).get('id');
+  if (!blogId) window.location.href = 'dashboard.html';
+
+  let rawMarkdown = '';
+  let showingRaw  = false;
+
+  API.me().then(u => {
+    document.getElementById('user-avatar').textContent = u.name[0].toUpperCase();
+    document.querySelector('.user-name').textContent   = u.name;
+    document.querySelector('.user-email').textContent  = u.email;
+  }).catch(() => {});
+
+  async function loadBlog() {
+    try {
+      const blog = await API.getBlog(blogId);
+      const tokensUsed = await API.getBlogTokens(blogId);
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      document.title = (blog.title || 'Blog') + ' — AI Blog Platform';
+
+      // Status badge
+      document.getElementById('blog-status-badge').innerHTML = statusBadge(blog.status);
+
+      // Markdown content
+      rawMarkdown = blog.final_content || '';
+      if (rawMarkdown) {
+        document.getElementById('markdown-view').innerHTML = renderMarkdown(rawMarkdown);
+        document.getElementById('raw-view').textContent = rawMarkdown;
+      } else {
+        document.getElementById('markdown-view').innerHTML =
+          `<p style="color:var(--text-muted);text-align:center;padding:40px">
+            Blog content not yet available. Status: <strong>${blog.status}</strong>
+           </p>`;
+      }
+
+      // Meta rows
+      const metaData = [
+        ['Status',   statusBadge(blog.status)],
+        ['Topic',    `<span style="color:var(--text-secondary)">${blog.topic}</span>`],
+        ['Created',  formatDate(blog.created_at)],
+        ['Updated',  formatDate(blog.updated_at)],
+        ['Tokens Used', tokensUsed.toLocaleString()]
+      ];
+      document.getElementById('meta-rows').innerHTML = metaData.map(([k, v]) =>
+        `<div class="meta-row"><span class="meta-key">${k}</span><span class="meta-val">${v}</span></div>`
+      ).join('');
+
+      // Extract citations from markdown
+      extractAndRenderCitations(rawMarkdown);
+
+    } catch (err) {
+      document.getElementById('loading').innerHTML =
+        `<p style="color:var(--error);text-align:center">${err.message}</p>`;
+    }
+  }
+
+  function extractAndRenderCitations(md) {
+    // Find all [Title](url) links in the References section
+    const refsMatch = md.match(/## References([\s\S]+)$/);
+    if (!refsMatch) return;
+    const refs = [...refsMatch[1].matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)];
+    if (!refs.length) return;
+
+    document.getElementById('citations-card').style.display = 'block';
+    document.getElementById('citation-count').textContent = `(${refs.length})`;
+    document.getElementById('citations-list').innerHTML = refs.map(([,title,url], i) => `
+      <div class="citation-item">
+        <div style="color:var(--text-muted);font-size:.75rem;margin-bottom:2px">${i+1}.</div>
+        <a href="${url}" target="_blank" rel="noopener">${title}</a>
+      </div>`).join('');
+  }
+
+  function toggleRaw() {
+    showingRaw = !showingRaw;
+    document.getElementById('markdown-view').style.display = showingRaw ? 'none' : 'block';
+    document.getElementById('raw-view').style.display = showingRaw ? 'block' : 'none';
+  }
+
+  function copyMarkdown() {
+    if (!rawMarkdown) { Toast.error('No content to copy.'); return; }
+    navigator.clipboard.writeText(rawMarkdown).then(() => Toast.success('Copied to clipboard!')).catch(() => Toast.error('Copy failed'));
+  }
+
+  loadBlog();
+</script>
+</body>
+</html>

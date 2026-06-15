@@ -1,0 +1,75 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# ==========================
+# Environment Variables
+# ==========================
+.env
+.env.*
+!.env.example
+
+# ==========================
+# IDEs
+# ==========================
+.vscode/
+.idea/
+
+# ==========================
+# OS Files
+# ==========================
+.DS_Store
+Thumbs.db
+
+# ==========================
+# Logs
+# ==========================
+*.log
+logs/
+
+# ==========================
+# Testing & Coverage
+# ==========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# ==========================
+# Build / Distribution
+# ==========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+
+# ==========================
+# Alembic
+# ==========================
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+
+# ==========================
+# Uploaded Files
+# ==========================
+uploads/
+media/
+static/uploads/
+
+# ==========================
+# Cache
+# ==========================
+.cache/
