@@ -177,3 +177,42 @@ class BlogHistoryItem(BaseModel):
     topic: str
     status: str
     created_at: datetime
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Edit Section
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+class SectionListItem(BaseModel):
+    section_id: str         
+    title: str
+    word_count: int
+    has_content: bool
+ 
+ 
+class EditSectionRequest(BaseModel):
+    section_id: str = Field(
+        ...,
+        description="Zero-based section index (as string) or exact section title.",
+        examples=["0", "Introduction", "3"],
+    )
+    instruction: str = Field(
+        ...,
+        min_length=5,
+        max_length=1000,
+        description="Natural-language instruction for the editor agent.",
+        examples=[
+            "Make this section more technical and add LangGraph code examples.",
+            "Rewrite for a beginner audience — avoid jargon.",
+            "Add more details about the performance benchmarks.",
+        ],
+    )
+ 
+ 
+class EditSectionResponse(BaseModel):
+    updated_blog: str
+    updated_section: str
+    section_title: str
+    section_idx: int
+    version: int
