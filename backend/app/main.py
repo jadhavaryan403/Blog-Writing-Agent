@@ -23,7 +23,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
 from app.middleware.tracing import TracingMiddleware
-from app.api.routes import auth, blogs, workflow, metrics, preferences
+from app.api.routes import auth, blogs, workflow, metrics, preferences, edit
 
 # Configure structured logging
 structlog.configure(
@@ -75,6 +75,7 @@ app.include_router(blogs.router, prefix=PREFIX)
 app.include_router(workflow.router, prefix=PREFIX)
 app.include_router(metrics.router, prefix=PREFIX)
 app.include_router(preferences.router, prefix=PREFIX)
+app.include_router(edit.router, prefix=PREFIX)
 
 
 # ── Health check ─────────────────────────────────────────────────────────────
