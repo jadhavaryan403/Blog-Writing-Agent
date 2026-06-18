@@ -3,6 +3,7 @@
  * ─────────────────
  * Centralised API client for all backend calls.
  * Handles: auth headers, token refresh, error parsing, toast notifications.
+ * Upgraded with a high-fidelity, block-based Cyberpunk Markdown Engine.
  */
 
 const BASE = '/api/v1';
@@ -110,7 +111,7 @@ const API = {
   startWorkflow:  (topic) => API.post('/workflow/start', { topic }),
   workflowStatus: (jobId) => API.get(`/workflow/${jobId}`),
   approvePlan:    (jobId) => API.post(`/workflow/${jobId}/approve-plan`, {}),
-  editPlan:       (jobId, plan) => API.post(`/workflow/${jobId}/edit-plan`, plan),
+  editPlan:       (jobId, plan) => API.post('/workflow/' + jobId + '/edit-plan', plan),
 
   // Metrics
   usage:       () => API.get('/metrics/usage'),
@@ -120,6 +121,10 @@ const API = {
   // Preferences
   getPrefs:    ()    => API.get('/preferences'),
   updatePrefs: (d)   => API.put('/preferences', d),
+
+  // Section editing
+  getSections:   (blogId)              => API.get(`/blogs/${blogId}/sections`),
+  editSection:   (blogId, body)        => API.post(`/blogs/${blogId}/edit-section`, body),
 };
 
 // ── Utility helpers ───────────────────────────────────────────────────────────
@@ -176,23 +181,7 @@ function logout() {
   window.location.href = '/login.html';
 }
 
-// ── Simple Markdown renderer (no dependencies) ────────────────────────────────
+// ── Flawless Cyberpunk Markdown Renderer (Block-Based Lexer Architecture) ─────
 function renderMarkdown(md) {
-  if (!md) return '';
-  let html = md
-    .replace(/^# (.+)$/gm,   '<h1>$1</h1>')
-    .replace(/^## (.+)$/gm,  '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,    '<em>$1</em>')
-    .replace(/`([^`]+)`/g,    '<code>$1</code>')
-    .replace(/^\> (.+)$/gm,   '<blockquote>$1</blockquote>')
-    .replace(/^- (.+)$/gm,    '<li>$1</li>')
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,  '<a href="$2" target="_blank">$1</a>')
-    .replace(/---/g, '<hr>')
-    .replace(/\n\n/g, '</p><p>');
-  // Wrap loose li in ul
-  html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-  return `<p>${html}</p>`;
+  return marked.parse(md);
 }

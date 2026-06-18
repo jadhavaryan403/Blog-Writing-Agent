@@ -6,41 +6,265 @@
   <title>Blog Viewer — AI Blog Platform</title>
   <link rel="stylesheet" href="../static/css/main.css" />
   <style>
+    /* ── Two-column layout ─────────────────────────────────────────────────── */
     .viewer-layout {
       display: grid;
-      grid-template-columns: 1fr 280px;
+      grid-template-columns: 260px 1fr;
       gap: 24px;
       align-items: start;
     }
-    @media (max-width: 960px) { .viewer-layout { grid-template-columns: 1fr; } }
-    .meta-panel {
+    @media (max-width: 1024px) {
+      .viewer-layout { grid-template-columns: 1fr; }
+      .sections-panel { order: 2; }
+      .blog-panel     { order: 1; }
+    }
+
+    /* ── Sections sidebar panel ────────────────────────────────────────────── */
+    .sections-panel {
       position: sticky;
       top: 24px;
     }
+    .section-nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .15s;
+      border: 1px solid transparent;
+      gap: 8px;
+    }
+    .section-nav-item:hover { background: var(--bg-hover); }
+    .section-nav-item.active {
+      background: var(--accent-dim);
+      border-color: rgba(108,99,255,.3);
+    }
+    .section-nav-title {
+      font-size: .84rem;
+      color: var(--text-secondary);
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4;
+    }
+    .section-nav-item.active .section-nav-title { color: var(--accent); font-weight: 500; }
+    .edit-btn {
+      flex-shrink: 0;
+      padding: 3px 9px;
+      font-size: .72rem;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .edit-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .section-idx-pill {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--bg-hover);
+      color: var(--text-muted);
+      font-size: .7rem;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-nav-item.active .section-idx-pill {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* ── Section highlight flash ───────────────────────────────────────────── */
+    @keyframes sectionFlash {
+      0%   { background: rgba(108,99,255,.18); }
+      100% { background: transparent; }
+    }
+    .section-highlight {
+      animation: sectionFlash 1.4s ease-out;
+      border-radius: var(--radius);
+      padding: 4px 8px;
+      margin: -4px -8px;
+    }
+
+    /* ── Edit Modal ────────────────────────────────────────────────────────── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: var(--bg-primary);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+    .modal-backdrop.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(16px);
+      transition: transform .2s;
+    }
+    .modal-backdrop.visible .modal { transform: translateY(0); }
+
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 20px; gap: 12px;
+    }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 1.3rem; line-height: 1;
+      padding: 2px 6px; border-radius: 4px;
+      transition: color .15s;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { color: var(--text-primary); }
+
+    .section-preview {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: .82rem;
+      color: var(--text-muted);
+      max-height: 120px;
+      overflow-y: auto;
+      margin-bottom: 18px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .suggestion-chips {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 12px;
+    }
+    .chip {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: .76rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .15s;
+      background: transparent;
+    }
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* ── Result flash banner ───────────────────────────────────────────────── */
+    .edit-result-banner {
+      background: rgba(34,197,94,.08);
+      border: 1px solid rgba(34,197,94,.25);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: .84rem;
+      color: var(--success);
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .edit-result-banner.visible { display: flex; }
+
+    /* ── Version badge ─────────────────────────────────────────────────────── */
+    .version-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108,99,255,.25);
+      color: var(--accent);
+      font-size: .74rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── Meta side panel ───────────────────────────────────────────────────── */
     .meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
+      padding: 9px 0;
       border-bottom: 1px solid var(--border);
-      font-size: .85rem;
+      font-size: .84rem;
     }
     .meta-row:last-child { border-bottom: none; }
     .meta-key { color: var(--text-muted); }
     .meta-val { color: var(--text-primary); font-weight: 500; }
-    .citation-item {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: .82rem;
+
+    .markdown-body {
+      line-height: 1.8;
+      color: var(--text-primary);
     }
-    .citation-item:last-child { border-bottom: none; }
-    .citation-item a { word-break: break-all; }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .markdown-body p {
+      margin-bottom: 1rem;
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .markdown-body blockquote {
+      border-left: 4px solid var(--accent);
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: var(--text-secondary);
+    }
+
+    .markdown-body pre {
+      background: #111;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .markdown-body th,
+    .markdown-body td {
+      border: 1px solid var(--border);
+      padding: 8px;
+    }
   </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Sidebar -->
+  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-text">✦ BlogAI</div>
@@ -48,15 +272,22 @@
     </div>
     <nav>
       <a class="nav-item" href="dashboard.html">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
         Dashboard
       </a>
       <a class="nav-item" href="create.html">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
         New Blog
       </a>
       <a class="nav-item" href="settings.html">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
         Settings
       </a>
     </nav>
@@ -64,25 +295,24 @@
       <div class="user-pill" onclick="logout()">
         <div class="avatar" id="user-avatar">?</div>
         <div style="overflow:hidden">
-          <div class="user-name" style="font-size:.85rem;font-weight:500;color:var(--text-primary)">…</div>
-          <div class="user-email" style="font-size:.73rem;color:var(--text-muted)"></div>
+          <div class="user-name" style="font-size:.85rem;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">…</div>
+          <div class="user-email" style="font-size:.73rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
         </div>
       </div>
     </div>
   </aside>
 
-  <!-- Main -->
+  <!-- ── Main ────────────────────────────────────────────────────────────── -->
   <main class="main-content">
 
     <!-- Toolbar -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <a href="dashboard.html" class="btn btn-secondary btn-sm">
-        ← Back
-      </a>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <a href="dashboard.html" class="btn btn-secondary btn-sm">← Back</a>
       <div id="blog-status-badge"></div>
+      <div id="version-badge" style="display:none"></div>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <button class="btn btn-secondary btn-sm" id="copy-btn" onclick="copyMarkdown()">Copy Markdown</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleRaw()">Toggle Raw</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyMarkdown()">Copy Markdown</button>
+        <button class="btn btn-secondary btn-sm" id="raw-toggle-btn" onclick="toggleRaw()">View Raw</button>
       </div>
     </div>
 
@@ -91,132 +321,397 @@
       <span class="spinner" style="width:36px;height:36px;border-width:3px"></span>
     </div>
 
-    <!-- Content -->
+    <!-- Edit success banner -->
+    <div class="edit-result-banner" id="edit-banner">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+      </svg>
+      <span id="edit-banner-text">Section updated successfully.</span>
+    </div>
+
+    <!-- Content (hidden until loaded) -->
     <div id="content" style="display:none">
       <div class="viewer-layout">
 
-        <!-- Blog body -->
-        <div>
-          <div class="card">
-            <!-- Rendered markdown view -->
-            <div id="markdown-view" class="markdown-body"></div>
-            <!-- Raw markdown view (hidden by default) -->
-            <pre id="raw-view" style="display:none;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow-x:auto;font-family:var(--font-mono);font-size:.82rem;white-space:pre-wrap;color:var(--text-secondary)"></pre>
+        <!-- ── Section nav panel ─────────────────────────────────────────── -->
+        <div class="sections-panel">
+          <div class="card" style="padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <h4 style="font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)">Sections</h4>
+              <span id="section-count" style="font-size:.75rem;color:var(--text-muted)"></span>
+            </div>
+            <div id="sections-nav"></div>
+          </div>
+
+          <!-- Meta info -->
+          <div class="card" style="padding:16px;margin-top:16px">
+            <h4 style="font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px">Info</h4>
+            <div id="meta-rows"></div>
           </div>
         </div>
 
-        <!-- Metadata panel -->
-        <div class="meta-panel">
-          <!-- Blog info -->
-          <div class="card" style="margin-bottom:16px">
-            <h4 style="margin-bottom:12px;font-size:.9rem;color:var(--text-primary)">Blog Info</h4>
-            <div id="meta-rows"></div>
-          </div>
-
-          <!-- Citations -->
-          <div class="card" id="citations-card" style="display:none">
-            <h4 style="margin-bottom:12px;font-size:.9rem;color:var(--text-primary)">
-              References <span id="citation-count" style="color:var(--text-muted);font-weight:400"></span>
-            </h4>
-            <div id="citations-list"></div>
+        <!-- ── Blog body ─────────────────────────────────────────────────── -->
+        <div class="blog-panel">
+          <div class="card" style="padding:28px 32px">
+            <div id="markdown-view" class="markdown-body"></div>
+            <pre id="raw-view"
+              style="display:none;white-space:pre-wrap;font-family:var(--font-mono);font-size:.8rem;color:var(--text-secondary);line-height:1.7"></pre>
           </div>
         </div>
 
       </div>
     </div>
-
   </main>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     Edit Section Modal
+════════════════════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="edit-modal" onclick="handleBackdropClick(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-title" style="color:var(--text-primary);font-size:1rem;margin-bottom:4px">
+          Edit Section
+        </h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="modal-section-idx"
+            style="background:var(--accent);color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700"></span>
+          <span id="modal-section-name" style="font-size:.88rem;color:var(--accent);font-weight:500"></span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Current section preview -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:.76rem;color:var(--text-muted);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.08em">
+        Current content preview
+      </div>
+      <div class="section-preview" id="modal-preview"></div>
+    </div>
+
+    <!-- Instruction suggestions -->
+    <div style="font-size:.76rem;color:var(--text-muted);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.08em">
+      Quick suggestions
+    </div>
+    <div class="suggestion-chips">
+      <button class="chip" onclick="useChip(this)">Make more technical</button>
+      <button class="chip" onclick="useChip(this)">Simplify for beginners</button>
+      <button class="chip" onclick="useChip(this)">Add code examples</button>
+      <button class="chip" onclick="useChip(this)">Add more detail</button>
+      <button class="chip" onclick="useChip(this)">Make it more concise</button>
+      <button class="chip" onclick="useChip(this)">Improve citations</button>
+      <button class="chip" onclick="useChip(this)">Add real-world examples</button>
+      <button class="chip" onclick="useChip(this)">Strengthen the introduction</button>
+    </div>
+
+    <!-- Instruction input -->
+    <div class="form-group" style="margin-bottom:20px">
+      <label for="edit-instruction">
+        Your instruction
+        <span style="color:var(--text-muted);font-weight:400;font-size:.8rem"> — be specific for best results</span>
+      </label>
+      <textarea
+        id="edit-instruction"
+        rows="3"
+        placeholder='e.g. "Make this section more technical and add LangGraph interrupt examples."'
+        style="resize:vertical"
+      ></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:4px">
+        <span id="char-count" style="font-size:.75rem;color:var(--text-muted)">0 / 1000</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="submit-edit-btn" onclick="submitEdit()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Apply Edit
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 
 <script src="../static/js/api.js"></script>
 <script>
   guardAuth();
 
+  // ── State ───────────────────────────────────────────────────────────────────
   const blogId = new URLSearchParams(window.location.search).get('id');
   if (!blogId) window.location.href = 'dashboard.html';
 
-  let rawMarkdown = '';
-  let showingRaw  = false;
+  let currentBlog       = null;   // Blog API response
+  let rawMarkdown       = '';     // Full blog markdown
+  let showingRaw        = false;
+  let sections          = [];     // [{section_id, title, word_count, has_content}]
+  let activeEditSection = null;   // {section_id, title, idx}
 
+  // ── Boot ────────────────────────────────────────────────────────────────────
   API.me().then(u => {
     document.getElementById('user-avatar').textContent = u.name[0].toUpperCase();
     document.querySelector('.user-name').textContent   = u.name;
     document.querySelector('.user-email').textContent  = u.email;
   }).catch(() => {});
 
-  async function loadBlog() {
+  async function init() {
     try {
-      const blog = await API.getBlog(blogId);
-      const tokensUsed = await API.getBlogTokens(blogId);
+      // Load blog + sections in parallel
+      const [blog, secs, blog_tokens] = await Promise.all([
+        API.getBlog(blogId),
+        API.getSections(blogId).catch(() => []),
+        API.getBlogTokens(blogId),
+      ]);
 
+      currentBlog  = blog;
+      sections     = secs;
+      rawMarkdown  = blog.final_content || '';
+      blogTokens   = blog_tokens;
+
+      document.title = (blog.title || 'Blog') + ' — AI Blog Platform';
       document.getElementById('loading').style.display = 'none';
       document.getElementById('content').style.display = 'block';
-      document.title = (blog.title || 'Blog') + ' — AI Blog Platform';
 
-      // Status badge
       document.getElementById('blog-status-badge').innerHTML = statusBadge(blog.status);
 
-      // Markdown content
-      rawMarkdown = blog.final_content || '';
-      if (rawMarkdown) {
-        document.getElementById('markdown-view').innerHTML = renderMarkdown(rawMarkdown);
-        document.getElementById('raw-view').textContent = rawMarkdown;
-      } else {
-        document.getElementById('markdown-view').innerHTML =
-          `<p style="color:var(--text-muted);text-align:center;padding:40px">
-            Blog content not yet available. Status: <strong>${blog.status}</strong>
-           </p>`;
-      }
-
-      // Meta rows
-      const metaData = [
-        ['Status',   statusBadge(blog.status)],
-        ['Topic',    `<span style="color:var(--text-secondary)">${blog.topic}</span>`],
-        ['Created',  formatDate(blog.created_at)],
-        ['Updated',  formatDate(blog.updated_at)],
-        ['Tokens Used', tokensUsed.toLocaleString()]
-      ];
-      document.getElementById('meta-rows').innerHTML = metaData.map(([k, v]) =>
-        `<div class="meta-row"><span class="meta-key">${k}</span><span class="meta-val">${v}</span></div>`
-      ).join('');
-
-      // Extract citations from markdown
-      extractAndRenderCitations(rawMarkdown);
-
+      renderBlogContent(rawMarkdown);
+      renderSectionsNav(sections);
+      renderMeta(blog, blog_tokens);
     } catch (err) {
       document.getElementById('loading').innerHTML =
         `<p style="color:var(--error);text-align:center">${err.message}</p>`;
     }
   }
 
-  function extractAndRenderCitations(md) {
-    // Find all [Title](url) links in the References section
-    const refsMatch = md.match(/## References([\s\S]+)$/);
-    if (!refsMatch) return;
-    const refs = [...refsMatch[1].matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)];
-    if (!refs.length) return;
+  // ── Render blog markdown ────────────────────────────────────────────────────
+  function renderBlogContent(md) {
+    rawMarkdown = md;
 
-    document.getElementById('citations-card').style.display = 'block';
-    document.getElementById('citation-count').textContent = `(${refs.length})`;
-    document.getElementById('citations-list').innerHTML = refs.map(([,title,url], i) => `
-      <div class="citation-item">
-        <div style="color:var(--text-muted);font-size:.75rem;margin-bottom:2px">${i+1}.</div>
-        <a href="${url}" target="_blank" rel="noopener">${title}</a>
+    const container = document.getElementById('markdown-view');
+
+    container.innerHTML = md
+      ? renderMarkdown(md)
+      : '<p style="color:var(--text-muted)">No content yet.</p>';
+
+    // Highlight code blocks
+    if (window.hljs) {
+      container.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
+      });
+    }
+
+    document.getElementById('raw-view').textContent = md;
+}
+
+  // ── Sections nav ────────────────────────────────────────────────────────────
+  function renderSectionsNav(secs) {
+    const nav = document.getElementById('sections-nav');
+    document.getElementById('section-count').textContent = `${secs.length} section${secs.length !== 1 ? 's' : ''}`;
+
+    if (!secs.length) {
+      nav.innerHTML = '<p style="color:var(--text-muted);font-size:.83rem;text-align:center;padding:16px">No sections found</p>';
+      return;
+    }
+
+    nav.innerHTML = secs.map((sec, i) => `
+      <div class="section-nav-item" id="nav-item-${sec.section_id}"
+           onclick="scrollToSection(${i}, '${esc(sec.section_id)}')">
+        <div class="section-idx-pill">${i + 1}</div>
+        <div class="section-nav-title" title="${esc(sec.title)}">${esc(sec.title)}</div>
+        <button class="edit-btn"
+          onclick="event.stopPropagation(); openEditModal('${esc(sec.section_id)}', '${esc(sec.title)}', ${i})"
+          title="Edit this section">
+          ✎ Edit
+        </button>
       </div>`).join('');
   }
 
+  // ── Meta panel ──────────────────────────────────────────────────────────────
+  function renderMeta(blog, tokens) {
+    document.getElementById('meta-rows').innerHTML = `
+      <div class="meta-row"><span class="meta-key">Status</span><span class="meta-val">${statusBadge(blog.status)}</span></div>
+      <div class="meta-row"><span class="meta-key">Topic</span><span class="meta-val" style="font-size:.8rem;max-width:120px;text-align:right;word-break:break-word">${blog.topic}</span></div>
+      <div class="meta-row"><span class="meta-key">Created</span><span class="meta-val">${formatDate(blog.created_at)}</span></div>
+      <div class="meta-row"><span class="meta-key">Updated</span><span class="meta-val">${formatDate(blog.updated_at)}</span></div>
+      <div class="meta-row"><span class="meta-key">Tokens Used</span><span class="meta-val">${tokens.toLocaleString()}</span></div>`;
+  }
+
+  // ── Scroll to section in the rendered blog ───────────────────────────────────
+  function scrollToSection(idx, sectionId) {
+    // Highlight nav item
+    document.querySelectorAll('.section-nav-item').forEach(el => el.classList.remove('active'));
+    const navItem = document.getElementById(`nav-item-${sectionId}`);
+    if (navItem) navItem.classList.add('active');
+
+    // Find the h2 heading for this section in the rendered markdown
+    const headings = document.getElementById('markdown-view').querySelectorAll('h2');
+    if (headings[idx]) {
+      headings[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      headings[idx].classList.add('section-highlight');
+      setTimeout(() => headings[idx].classList.remove('section-highlight'), 1400);
+    }
+  }
+
+  // ── Raw / rendered toggle ───────────────────────────────────────────────────
   function toggleRaw() {
     showingRaw = !showingRaw;
     document.getElementById('markdown-view').style.display = showingRaw ? 'none' : 'block';
-    document.getElementById('raw-view').style.display = showingRaw ? 'block' : 'none';
+    document.getElementById('raw-view').style.display      = showingRaw ? 'block' : 'none';
+    document.getElementById('raw-toggle-btn').textContent  = showingRaw ? 'View Rendered' : 'View Raw';
   }
 
   function copyMarkdown() {
     if (!rawMarkdown) { Toast.error('No content to copy.'); return; }
-    navigator.clipboard.writeText(rawMarkdown).then(() => Toast.success('Copied to clipboard!')).catch(() => Toast.error('Copy failed'));
+    navigator.clipboard.writeText(rawMarkdown)
+      .then(() => Toast.success('Copied to clipboard!'))
+      .catch(() => Toast.error('Copy failed'));
   }
 
-  loadBlog();
+  // ══════════════════════════════════════════════════════════════════════════════
+  // Edit Modal
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  function openEditModal(sectionId, title, idx) {
+    activeEditSection = { section_id: sectionId, title, idx };
+
+    document.getElementById('modal-title').textContent         = 'Edit Section';
+    document.getElementById('modal-section-idx').textContent   = idx + 1;
+    document.getElementById('modal-section-name').textContent  = title;
+    document.getElementById('edit-instruction').value          = '';
+    document.getElementById('char-count').textContent          = '0 / 1000';
+
+    // Populate preview: extract the section's text from rendered markdown
+    const preview = extractSectionText(idx);
+    document.getElementById('modal-preview').textContent = preview || '(no content yet)';
+
+    // Show modal
+    document.getElementById('edit-modal').classList.add('visible');
+    document.getElementById('edit-instruction').focus();
+
+    // Highlight nav item
+    document.querySelectorAll('.section-nav-item').forEach(el => el.classList.remove('active'));
+    const navItem = document.getElementById(`nav-item-${sectionId}`);
+    if (navItem) navItem.classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('edit-modal').classList.remove('visible');
+    document.getElementById('submit-edit-btn').disabled = false;
+    document.getElementById('submit-edit-btn').innerHTML = `
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+      </svg> Apply Edit`;
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target === document.getElementById('edit-modal')) closeModal();
+  }
+
+  // Keyboard close
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Character counter
+  document.getElementById('edit-instruction').addEventListener('input', function() {
+    document.getElementById('char-count').textContent = `${this.value.length} / 1000`;
+  });
+
+  // Suggestion chips
+  function useChip(btn) {
+    const textarea = document.getElementById('edit-instruction');
+    const current  = textarea.value.trim();
+    textarea.value = current ? current + '. ' + btn.textContent : btn.textContent;
+    textarea.focus();
+    document.getElementById('char-count').textContent = `${textarea.value.length} / 1000`;
+  }
+
+  // ── Extract plain-text snippet for the section preview ─────────────────────
+  function extractSectionText(idx) {
+    // Parse the markdown to find the nth section (between ## headings)
+    const blocks = rawMarkdown.split(/^## /m);
+    // blocks[0] = title block, blocks[1..n] = sections
+    if (blocks[idx + 1]) {
+      return blocks[idx + 1]
+        .replace(/^.+\n/, '')          // remove the heading line
+        .replace(/!\[[^\]]*\]\((.*?)\)/g, '') // strip images
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // flatten links
+        .replace(/[*_`#]/g, '')         // strip markdown symbols
+        .slice(0, 400)
+        .trim();
+    }
+    return '';
+  }
+
+  // ── Submit edit ─────────────────────────────────────────────────────────────
+  async function submitEdit() {
+    const instruction = document.getElementById('edit-instruction').value.trim();
+    if (!instruction) {
+      Toast.error('Please enter an edit instruction.');
+      return;
+    }
+    if (!activeEditSection) return;
+
+    const btn = document.getElementById('submit-edit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Editing with AI…';
+
+    try {
+      const result = await API.editSection(blogId, {
+        section_id:  activeEditSection.section_id,
+        instruction: instruction,
+      });
+
+      // Close modal
+      closeModal();
+
+      // Update blog content in-page
+      renderBlogContent(result.updated_blog);
+
+      // Update version badge
+      const vBadge = document.getElementById('version-badge');
+      vBadge.style.display = 'flex';
+      vBadge.innerHTML = `<span class="version-tag">✦ v${result.version}</span>`;
+
+      // Show success banner
+      const banner = document.getElementById('edit-banner');
+      document.getElementById('edit-banner-text').textContent =
+        `"${result.section_title}" updated successfully (version ${result.version}).`;
+      banner.classList.add('visible');
+      setTimeout(() => banner.classList.remove('visible'), 5000);
+
+      // Scroll to the edited section
+      setTimeout(() => scrollToSection(result.section_idx, activeEditSection.section_id), 150);
+
+      Toast.success(`Section "${result.section_title}" edited!`);
+    } catch (err) {
+      Toast.error('Edit failed: ' + err.message);
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg> Apply Edit`;
+    }
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  init();
 </script>
+
 </body>
 </html>

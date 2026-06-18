@@ -14,21 +14,21 @@
     @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } }
 
     .section-title {
-      font-size: .72rem;
+      font-size: .65rem;
       text-transform: uppercase;
-      letter-spacing: .12em;
+      letter-spacing: .14em;
       color: var(--text-muted);
       margin-bottom: 16px;
       font-weight: 600;
+      font-family: var(--font-mono);
     }
 
-    /* Current-values summary strip */
     .pref-summary {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       padding: 14px 16px;
-      background: var(--bg-input);
+      background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       margin-bottom: 24px;
@@ -37,34 +37,30 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: .78rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: .74rem;
       background: var(--accent-dim);
-      border: 1px solid rgba(108,99,255,.25);
+      border: 1px solid var(--border-accent);
+      font-family: var(--font-mono);
     }
-    .pref-chip-key  { color: var(--text-muted); }
-    .pref-chip-val  { color: var(--accent); font-weight: 600; }
+    .pref-chip-key { color: var(--text-muted); }
+    .pref-chip-val { color: var(--accent); font-weight: 600; }
 
-    /* Success flash on the card border */
     .card.saved-flash {
-      border-color: var(--success);
-      transition: border-color .3s;
+      border-color: rgba(34,197,94,0.40) !important;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.15), 0 2px 20px rgba(0,0,0,0.40) !important;
+      transition: border-color .3s, box-shadow .3s;
     }
 
-    /* Field helper text */
     .field-hint {
-      font-size: .76rem;
+      font-size: .74rem;
       color: var(--text-muted);
       margin-top: 5px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
-    /* Word-count display */
-    .wc-track {
-      position: relative;
-      margin-top: 10px;
-    }
+    .wc-track { position: relative; margin-top: 10px; }
     .wc-track input[type="range"] {
       width: 100%;
       accent-color: var(--accent);
@@ -73,41 +69,57 @@
       background: transparent;
       padding: 0;
     }
-    .wc-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 6px;
-    }
+    .wc-labels { display: flex; justify-content: space-between; margin-top: 6px; }
     .wc-badge {
       display: inline-block;
       background: var(--accent);
       color: #fff;
-      font-size: .82rem;
+      font-size: .78rem;
       font-weight: 700;
-      padding: 3px 12px;
-      border-radius: 20px;
-      min-width: 90px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      min-width: 88px;
       text-align: center;
+      font-family: var(--font-mono);
+      box-shadow: 0 0 10px rgba(94,106,210,0.35);
     }
 
-    /* Updated-at line */
     .updated-line {
-      font-size: .78rem;
+      font-size: .74rem;
       color: var(--text-muted);
-      margin-top: 18px;
+      margin-top: 16px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
     .updated-dot {
-      width: 6px; height: 6px;
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: var(--success);
       display: inline-block;
+      box-shadow: 0 0 6px rgba(34,197,94,0.5);
+    }
+
+    /* Profile avatar (larger) */
+    .profile-avatar-lg {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; font-weight: 600; color: white;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(94,106,210,0.40), 0 4px 16px rgba(94,106,210,0.25);
     }
   </style>
 </head>
 <body>
+<!-- Ambient blobs -->
+<div class="ambient-blobs">
+  <div class="blob blob-primary"></div>
+  <div class="blob blob-secondary"></div>
+  <div class="blob blob-tertiary"></div>
+</div>
+
 <div class="page">
 
   <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
@@ -118,19 +130,19 @@
     </div>
     <nav>
       <a class="nav-item" href="dashboard.html">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
         </svg>
         Dashboard
       </a>
       <a class="nav-item" href="create.html">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         New Blog
       </a>
       <a class="nav-item active" href="settings.html">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
@@ -142,7 +154,7 @@
         <div class="avatar" id="user-avatar">?</div>
         <div style="overflow:hidden">
           <div class="user-name" style="font-size:.85rem;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">…</div>
-          <div class="user-email" style="font-size:.73rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          <div class="user-email" style="font-size:.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
         </div>
       </div>
     </div>
@@ -153,25 +165,21 @@
     <div style="max-width:720px">
 
       <div style="margin-bottom:28px">
-        <h1 style="font-size:1.6rem">Settings</h1>
-        <p style="color:var(--text-muted);font-size:.9rem;margin-top:4px">
+        <h1 style="font-size:1.5rem;letter-spacing:-0.03em">Settings</h1>
+        <p style="color:var(--text-muted);font-size:.85rem;margin-top:5px">
           Manage your account and writing preferences used by the AI agents.
         </p>
       </div>
 
       <!-- ── Account card ─────────────────────────────────────────────────── -->
-      <div class="card" style="margin-bottom:24px">
+      <div class="card" style="margin-bottom:20px">
         <p class="section-title">Account</p>
         <div style="display:flex;align-items:center;gap:16px">
-          <div class="avatar" id="profile-avatar"
-            style="width:52px;height:52px;font-size:1.3rem;flex-shrink:0">?</div>
+          <div class="profile-avatar-lg" id="profile-avatar">?</div>
           <div style="flex:1;min-width:0">
-            <div id="profile-name"
-              style="font-size:1rem;font-weight:600;color:var(--text-primary)">…</div>
-            <div id="profile-email"
-              style="font-size:.85rem;color:var(--text-muted);margin-top:2px"></div>
-            <div id="profile-since"
-              style="font-size:.78rem;color:var(--text-muted);margin-top:4px"></div>
+            <div id="profile-name" style="font-size:1rem;font-weight:600;color:var(--text-primary);letter-spacing:-0.01em">…</div>
+            <div id="profile-email" style="font-size:.83rem;color:var(--text-muted);margin-top:2px"></div>
+            <div id="profile-since" style="font-size:.75rem;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)"></div>
           </div>
           <button class="btn btn-danger btn-sm" onclick="logout()">Sign Out</button>
         </div>
@@ -180,15 +188,15 @@
       <!-- ── Writing Preferences card ────────────────────────────────────── -->
       <div class="card" id="prefs-card">
         <p class="section-title">Writing Preferences</p>
-        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:18px">
-          These are injected into the <strong style="color:var(--text-primary)">Planner</strong>
-          and <strong style="color:var(--text-primary)">Writer</strong> agents for every blog
+        <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:18px">
+          These are injected into the <strong style="color:var(--text-primary);font-weight:500">Planner</strong>
+          and <strong style="color:var(--text-primary);font-weight:500">Writer</strong> agents for every blog
           you generate. Changes take effect on the next run.
         </p>
 
-        <!-- Current values summary (shown after load / save) -->
+        <!-- Current values summary -->
         <div id="pref-summary-wrap" style="display:none">
-          <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:500">
+          <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:6px;font-weight:600;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em">
             ✦ Active preferences
           </div>
           <div class="pref-summary" id="pref-summary"></div>
@@ -196,16 +204,14 @@
 
         <!-- Spinner while loading -->
         <div id="prefs-loading" style="text-align:center;padding:36px">
-          <span class="spinner" style="width:28px;height:28px;border-width:3px"></span>
-          <p style="color:var(--text-muted);font-size:.85rem;margin-top:12px">Loading preferences…</p>
+          <span class="spinner" style="width:28px;height:28px;border-width:2px"></span>
+          <p style="color:var(--text-muted);font-size:.83rem;margin-top:12px">Loading preferences…</p>
         </div>
 
         <!-- Form (revealed after load) -->
-        <form id="prefs-form" onsubmit="savePrefs(event)">
+        <form id="prefs-form" onsubmit="savePrefs(event)" style="display:none">
 
           <div class="settings-grid">
-
-            <!-- Tone -->
             <div class="form-group">
               <label for="tone">Writing Tone</label>
               <select id="tone">
@@ -219,7 +225,6 @@
               <p class="field-hint">Sets the overall voice and personality of the writing.</p>
             </div>
 
-            <!-- Style -->
             <div class="form-group">
               <label for="style">Writing Style</label>
               <select id="style">
@@ -233,7 +238,6 @@
               <p class="field-hint">Controls the structural format and flow of the blog.</p>
             </div>
 
-            <!-- Depth -->
             <div class="form-group">
               <label for="depth">Technical Depth</label>
               <select id="depth">
@@ -245,7 +249,6 @@
               <p class="field-hint">Adjusts how much jargon and depth the writer uses.</p>
             </div>
 
-            <!-- Language -->
             <div class="form-group">
               <label for="language">Output Language</label>
               <select id="language">
@@ -273,22 +276,21 @@
               <input type="range" id="word-count" min="500" max="5000" step="100"
                 oninput="onWcChange(this.value)" />
               <div class="wc-labels">
-                <span style="font-size:.76rem;color:var(--text-muted)">500 (short)</span>
-                <span style="font-size:.76rem;color:var(--text-muted)">2 500</span>
-                <span style="font-size:.76rem;color:var(--text-muted)">5 000 (long)</span>
+                <span style="font-size:.72rem;color:var(--text-muted)">500 (short)</span>
+                <span style="font-size:.72rem;color:var(--text-muted)">2 500</span>
+                <span style="font-size:.72rem;color:var(--text-muted)">5 000 (long)</span>
               </div>
             </div>
             <p class="field-hint">The Planner will distribute this word count across sections.</p>
           </div>
 
           <!-- Divider -->
-          <div style="height:1px;background:var(--border);margin:20px 0"></div>
+          <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);margin:22px 0"></div>
 
           <!-- Action row -->
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <button type="submit" class="btn btn-primary" id="save-btn">
-              <svg width="15" height="15" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2.5" style="flex-shrink:0">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
               Save Preferences
@@ -296,15 +298,13 @@
             <button type="button" class="btn btn-secondary" onclick="resetToDefaults()">
               Reset to Defaults
             </button>
-            <div id="save-status" style="font-size:.82rem;margin-left:auto"></div>
+            <div id="save-status" style="font-size:.8rem;margin-left:auto"></div>
           </div>
 
-          <!-- Last updated -->
           <div class="updated-line" id="updated-line" style="display:none">
             <span class="updated-dot"></span>
             Last saved: <span id="updated-at"></span>
           </div>
-
         </form>
       </div>
 
@@ -312,11 +312,11 @@
   </main>
 </div>
 
+<div id="toast-container"></div>
 <script src="../static/js/api.js"></script>
 <script>
   guardAuth();
 
-  // ── Load user info ──────────────────────────────────────────────────────────
   API.me().then(u => {
     document.getElementById('user-avatar').textContent    = u.name[0].toUpperCase();
     document.querySelector('.user-name').textContent      = u.name;
@@ -324,31 +324,27 @@
     document.getElementById('profile-avatar').textContent = u.name[0].toUpperCase();
     document.getElementById('profile-name').textContent   = u.name;
     document.getElementById('profile-email').textContent  = u.email;
-    document.getElementById('profile-since').textContent  =
-      'Member since ' + formatDate(u.created_at);
+    document.getElementById('profile-since').textContent  = 'Member since ' + formatDate(u.created_at);
   }).catch(() => {});
 
-  // ── Helpers ─────────────────────────────────────────────────────────────────
   const DEFAULTS = {
-    preferred_tone:        'professional',
-    preferred_style:       'informative',
-    technical_depth:       'intermediate',
-    preferred_language:    'English',
-    preferred_word_count:  1500,
+    preferred_tone:       'professional',
+    preferred_style:      'informative',
+    technical_depth:      'intermediate',
+    preferred_language:   'English',
+    preferred_word_count: 1500,
   };
 
   function onWcChange(val) {
-    document.getElementById('wc-badge').textContent =
-      Number(val).toLocaleString() + ' words';
+    document.getElementById('wc-badge').textContent = Number(val).toLocaleString() + ' words';
   }
 
-  // Maps raw values → human-readable labels for the summary strip
   const LABELS = {
-    preferred_tone:       { label: 'Tone',      fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    preferred_style:      { label: 'Style',     fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    technical_depth:      { label: 'Depth',     fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    preferred_language:   { label: 'Language',  fn: v => v },
-    preferred_word_count: { label: 'Words',     fn: v => Number(v).toLocaleString() },
+    preferred_tone:       { label: 'Tone',     fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
+    preferred_style:      { label: 'Style',    fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
+    technical_depth:      { label: 'Depth',    fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
+    preferred_language:   { label: 'Language', fn: v => v },
+    preferred_word_count: { label: 'Words',    fn: v => Number(v).toLocaleString() },
   };
 
   function renderSummary(prefs) {
@@ -365,15 +361,12 @@
   }
 
   function populateForm(p) {
-    // Extract bare depth value (strip descriptive suffix if present)
     const rawDepth = (p.technical_depth || 'intermediate').split(' ')[0].toLowerCase();
+    document.getElementById('tone').value     = p.preferred_tone    || DEFAULTS.preferred_tone;
+    document.getElementById('depth').value    = rawDepth;
+    document.getElementById('language').value = p.preferred_language || DEFAULTS.preferred_language;
 
-    document.getElementById('tone').value      = p.preferred_tone     || DEFAULTS.preferred_tone;
-    document.getElementById('depth').value     = rawDepth;
-    document.getElementById('language').value  = p.preferred_language || DEFAULTS.preferred_language;
-
-    // Style: match against option values case-insensitively
-    const styleEl = document.getElementById('style');
+    const styleEl  = document.getElementById('style');
     const styleVal = (p.preferred_style || DEFAULTS.preferred_style).toLowerCase();
     for (const opt of styleEl.options) {
       if (opt.value.toLowerCase() === styleVal) { styleEl.value = opt.value; break; }
@@ -383,50 +376,36 @@
     document.getElementById('word-count').value = wc;
     onWcChange(wc);
 
-    // Updated at
     if (p.updated_at) {
       document.getElementById('updated-line').style.display = 'flex';
       document.getElementById('updated-at').textContent = formatDate(p.updated_at);
     }
   }
 
-  // ── Load preferences ────────────────────────────────────────────────────────
   async function loadPrefs() {
     try {
       const p = await API.getPrefs();
-
       document.getElementById('prefs-loading').style.display = 'none';
       document.getElementById('prefs-form').style.display    = 'block';
-
       populateForm(p);
       renderSummary(p);
     } catch (err) {
-      // Show the editable form even if loading preferences failed so the
-      // user can still view and save defaults locally.
       document.getElementById('prefs-loading').style.display = 'none';
       document.getElementById('prefs-form').style.display    = 'block';
-
-      // Populate with defaults and render the summary so the UI isn't empty.
       populateForm(DEFAULTS);
       renderSummary(DEFAULTS);
-
-      // Surface a non-blocking error message near the save status.
       const statusEl = document.getElementById('save-status');
-      if (statusEl) {
-        statusEl.innerHTML = `<span style="color:var(--error)">Failed to load preferences: ${err.message}</span>`;
-      }
-
+      if (statusEl) statusEl.innerHTML = `<span style="color:var(--error)">Failed to load: ${err.message}</span>`;
       Toast.error('Failed to load preferences');
     }
   }
 
-  // ── Save preferences ────────────────────────────────────────────────────────
   async function savePrefs(e) {
     e.preventDefault();
-    const btn       = document.getElementById('save-btn');
-    const statusEl  = document.getElementById('save-status');
-    btn.disabled    = true;
-    btn.innerHTML   = '<span class="spinner"></span> Saving…';
+    const btn      = document.getElementById('save-btn');
+    const statusEl = document.getElementById('save-status');
+    btn.disabled   = true;
+    btn.innerHTML  = '<span class="spinner"></span> Saving…';
     statusEl.textContent = '';
 
     const payload = {
@@ -439,36 +418,28 @@
 
     try {
       const updated = await API.updatePrefs(payload);
-
-      // Re-populate form with what the server confirmed
       populateForm(updated);
       renderSummary(updated);
 
-      // Visual feedback
       const card = document.getElementById('prefs-card');
       card.classList.add('saved-flash');
       setTimeout(() => card.classList.remove('saved-flash'), 1200);
 
-      statusEl.innerHTML =
-        `<span style="color:var(--success)">✓ Saved successfully</span>`;
+      statusEl.innerHTML = `<span style="color:var(--success)">✓ Saved successfully</span>`;
       Toast.success('Preferences saved!');
-
       setTimeout(() => { statusEl.textContent = ''; }, 4000);
     } catch (err) {
-      statusEl.innerHTML =
-        `<span style="color:var(--error)">✕ ${err.message}</span>`;
+      statusEl.innerHTML = `<span style="color:var(--error)">✕ ${err.message}</span>`;
       Toast.error('Save failed: ' + err.message);
     } finally {
       btn.disabled  = false;
       btn.innerHTML = `
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"
-          stroke="currentColor" stroke-width="2.5">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
         </svg> Save Preferences`;
     }
   }
 
-  // ── Reset to defaults ────────────────────────────────────────────────────────
   function resetToDefaults() {
     populateForm(DEFAULTS);
     document.getElementById('save-status').innerHTML =
