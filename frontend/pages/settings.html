@@ -149,15 +149,6 @@
         Settings
       </a>
     </nav>
-    <div class="sidebar-footer">
-      <div class="user-pill" onclick="logout()">
-        <div class="avatar" id="user-avatar">?</div>
-        <div style="overflow:hidden">
-          <div class="user-name" style="font-size:.85rem;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">…</div>
-          <div class="user-email" style="font-size:.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-        </div>
-      </div>
-    </div>
   </aside>
 
   <!-- ── Main ────────────────────────────────────────────────────────────── -->
@@ -169,20 +160,6 @@
         <p style="color:var(--text-muted);font-size:.85rem;margin-top:5px">
           Manage your account and writing preferences used by the AI agents.
         </p>
-      </div>
-
-      <!-- ── Account card ─────────────────────────────────────────────────── -->
-      <div class="card" style="margin-bottom:20px">
-        <p class="section-title">Account</p>
-        <div style="display:flex;align-items:center;gap:16px">
-          <div class="profile-avatar-lg" id="profile-avatar">?</div>
-          <div style="flex:1;min-width:0">
-            <div id="profile-name" style="font-size:1rem;font-weight:600;color:var(--text-primary);letter-spacing:-0.01em">…</div>
-            <div id="profile-email" style="font-size:.83rem;color:var(--text-muted);margin-top:2px"></div>
-            <div id="profile-since" style="font-size:.75rem;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)"></div>
-          </div>
-          <button class="btn btn-danger btn-sm" onclick="logout()">Sign Out</button>
-        </div>
       </div>
 
       <!-- ── Writing Preferences card ────────────────────────────────────── -->
@@ -209,7 +186,7 @@
         </div>
 
         <!-- Form (revealed after load) -->
-        <form id="prefs-form" onsubmit="savePrefs(event)" style="display:none">
+        <form id="prefs-form" onsubmit="savePrefs(event)">
 
           <div class="settings-grid">
             <div class="form-group">
@@ -317,15 +294,7 @@
 <script>
   guardAuth();
 
-  API.me().then(u => {
-    document.getElementById('user-avatar').textContent    = u.name[0].toUpperCase();
-    document.querySelector('.user-name').textContent      = u.name;
-    document.querySelector('.user-email').textContent     = u.email;
-    document.getElementById('profile-avatar').textContent = u.name[0].toUpperCase();
-    document.getElementById('profile-name').textContent   = u.name;
-    document.getElementById('profile-email').textContent  = u.email;
-    document.getElementById('profile-since').textContent  = 'Member since ' + formatDate(u.created_at);
-  }).catch(() => {});
+  
 
   const DEFAULTS = {
     preferred_tone:       'professional',
@@ -388,7 +357,11 @@
       document.getElementById('prefs-loading').style.display = 'none';
       document.getElementById('prefs-form').style.display    = 'block';
       populateForm(p);
+      console.log("before", document.getElementById('prefs-form'));
+
       renderSummary(p);
+
+      console.log("after", document.getElementById('prefs-form'));
     } catch (err) {
       document.getElementById('prefs-loading').style.display = 'none';
       document.getElementById('prefs-form').style.display    = 'block';
