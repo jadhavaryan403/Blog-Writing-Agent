@@ -28,3 +28,15 @@ def get_llm(temperature: float | None = None) -> ChatGroq:
         temperature=temperature if temperature is not None else settings.GROQ_TEMPERATURE,
         api_key=settings.GROQ_API_KEY,
     )
+
+
+def get_guard_llm(temperature: float | None = 0.1) -> ChatGroq:
+    """Return a small llm model instance for guardrail"""
+    return ChatGroq(
+        model='openai/gpt-oss-20b',
+        temperature=temperature,
+        api_key=settings.GROQ_API_KEY,
+        model_kwargs={
+        "response_format": {"type": "json_object"}
+                    }
+    )
