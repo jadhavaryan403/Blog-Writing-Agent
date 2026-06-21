@@ -43,7 +43,7 @@
 
       <p style="text-align:center;margin-top:24px;font-size:.82rem;color:var(--text-muted)">
         Don't have an account?
-        <a href="register.html" style="color:var(--accent)">Create one</a>
+        <a href="/register" style="color:var(--accent)">Create one</a>
       </p>
     </div>
   </div>
@@ -51,7 +51,7 @@
   <div id="toast-container"></div>
   <script src="../static/js/api.js"></script>
   <script>
-    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+    if (Auth.isLoggedIn()) window.location.href = '/dashboard';
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -66,7 +66,7 @@
         });
         Auth.save(tokens);
         Toast.success('Welcome back!');
-        setTimeout(() => window.location.href = 'dashboard.html', 500);
+        setTimeout(() => window.location.href = '/dashboard', 500);
       } catch (err) {
         Toast.error(err.message);
         btn.disabled = false;

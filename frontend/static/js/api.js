@@ -71,7 +71,7 @@ async function request(method, path, body = null, retry = true) {
       return request(method, path, body, false);
     } else {
       Auth.clear();
-      window.location.href = '/login.html';
+      window.location.href = '/login';
       return;
     }
   }
@@ -129,7 +129,7 @@ const API = {
 
 // ── Utility helpers ───────────────────────────────────────────────────────────
 function guardAuth() {
-  if (!Auth.isLoggedIn()) window.location.href = '/login.html';
+  if (!Auth.isLoggedIn()) window.location.href = '/login';
 }
 
 function formatCost(n) {
@@ -157,7 +157,7 @@ function statusBadge(status) {
 
 // Sidebar active state
 function setActiveNav() {
-  const page = window.location.pathname.split('/').pop() || 'dashboard.html';
+  const page = window.location.pathname;
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.getAttribute('href') === page);
   });
@@ -178,7 +178,7 @@ async function renderSidebarUser() {
 
 function logout() {
   Auth.clear();
-  window.location.href = '/login.html';
+  window.location.href = '/login';
 }
 
 // ── Flawless Cyberpunk Markdown Renderer (Block-Based Lexer Architecture) ─────
