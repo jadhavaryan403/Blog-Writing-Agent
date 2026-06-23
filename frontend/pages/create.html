@@ -171,7 +171,7 @@
           <!-- Topic -->
           <div class="form-group">
             <label for="topic">Blog topic <span style="color:var(--error)">*</span></label>
-            <textarea id="topic" rows="3" placeholder="e.g. The future of agentic AI systems and how they will reshape knowledge work…" required></textarea>
+            <textarea id="topic" rows="1" placeholder="e.g. The future of agentic AI systems and how they will reshape knowledge work…" required minlength="3" maxlength="100"></textarea>
             <div class="topic-examples">
               <span class="example-chip" onclick="setTopic(this)">LangGraph multi-agent systems</span>
               <span class="example-chip" onclick="setTopic(this)">Climate tech innovations 2026</span>
@@ -284,26 +284,56 @@
 
   document.getElementById('create-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const topic = document.getElementById('topic').value.trim();
-    if (!topic) { Toast.error('Please enter a topic.'); return; }
+
+    if (!topic) {
+      Toast.error('Please enter a topic.');
+      return;
+    }
 
     const btn = document.getElementById('submit-btn');
+
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Starting workflow…';
+    btn.innerHTML =
+      '<span class="spinner"></span> Validating topic & starting workflow...';
 
     try {
       const result = await API.startWorkflow(topic);
-      Toast.success('Blog workflow started! Redirecting to approval…');
+
+      Toast.success(
+        'Plan generated successfully! Redirecting to approval...'
+      );
+
       setTimeout(() => {
-        window.location.href = `/approval?job_id=${result.job_id}&blog_id=${result.blog_id}`;
+        window.location.href =
+          `/approval?job_id=${result.job_id}&blog_id=${result.blog_id}`;
       }, 800);
+
     } catch (err) {
-      Toast.error(err.message);
+
+      // FastAPI validation / topic judge rejection
+      const message =
+        err?.response?.data?.detail ||
+        err?.detail ||
+        err?.message ||
+        'Unable to start workflow';
+
+      Toast.error(message);
+
       btn.disabled = false;
+
       btn.innerHTML = `
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-        </svg> Generate Blog`;
+        <svg width="16" height="16" fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2">
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Generate Blog
+      `;
     }
   });
 </script>
