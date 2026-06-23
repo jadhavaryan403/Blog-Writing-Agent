@@ -7,7 +7,7 @@ Section editing endpoints:
   POST /blogs/{blog_id}/edit-section      — edit one section with an instruction
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_db
@@ -18,6 +18,7 @@ from app.schemas import (
     SectionListItem,
 )
 from app.services.edit_service import edit_blog_section, get_blog_sections
+from app.services.guardrails import edit_judge
 
 router = APIRouter(prefix="/blogs", tags=["section-editing"])
 
@@ -52,6 +53,20 @@ async def edit_section_endpoint(
     - Applies the instruction and returns only the updated section
     - The full blog is re-stitched and persisted automatically
     """
+    print("EDIT ENDPOINT HIT")
+    print("Instruction:", data.instruction)
+
+    validation = await edit_judge(
+        instruction=data.instruction
+    )
+    print("Validation:", validation)
+
+    if not validation.allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=validation.reason
+        )
+
     return await edit_blog_section(
         db=db,
         blog_id=blog_id,

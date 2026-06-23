@@ -23,6 +23,7 @@ from app.schemas import (
     WorkflowStatusResponse,
 )
 from app.services import workflow_service
+from app.services.guardrails import topic_judge
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
 
@@ -37,7 +38,18 @@ async def start_workflow(
     Start a new blog generation workflow.
     Returns immediately after the Planner runs (workflow pauses for human approval).
     """
+
+    # ---------- Topic Validation ----------
+    validation = await topic_judge(data.topic)
+
+    if not validation.allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=validation.reason,
+        )
+
     result = await workflow_service.start_workflow(db, current_user.id, data.topic)
+
     return WorkflowStartResponse(
         job_id=result["job_id"],
         blog_id=result["blog_id"],
@@ -78,6 +90,7 @@ async def edit_plan(
     current_user: User = Depends(get_current_user),
 ):
     """Submit an edited plan and resume the workflow."""
+
     edited = {
         "title": data.title,
         "sections": [s.model_dump() for s in data.sections],
