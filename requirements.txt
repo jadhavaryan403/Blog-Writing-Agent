@@ -13,6 +13,7 @@ alembic
 # Auth
 python-jose[cryptography]
 passlib[bcrypt]
+pydantic[email]
 
 # AI / LangGraph
 langchain
