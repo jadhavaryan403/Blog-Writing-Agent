@@ -71,7 +71,13 @@ class PreferenceUpdate(BaseModel):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class BlogCreateRequest(BaseModel):
-    topic: str = Field(..., min_length=5, max_length=500)
+    topic: str
+
+    tone: str | None = None
+    style: str | None = None
+    technical_depth: str | None = None
+    language: str | None = None
+    word_count: int | None = None
 
 
 class BlogOut(BaseModel):
