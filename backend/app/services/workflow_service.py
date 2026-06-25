@@ -84,6 +84,7 @@ async def start_workflow(
     db: AsyncSession,
     user_id: int,
     topic: str,
+    overrides: dict | None = None,
 ) -> dict[str, Any]:
     """
     Create Blog record, build initial state, run the graph until the
@@ -100,6 +101,14 @@ async def start_workflow(
 
     # 2. Load user preferences
     preferences = await _load_preferences(db, user_id)
+    if overrides:
+        preferences.update(
+            {
+                k: v
+                for k, v in overrides.items()
+                if v is not None
+            }
+        )
 
     # 3. Build initial state
     now = datetime.now(timezone.utc).isoformat()

@@ -48,7 +48,18 @@ async def start_workflow(
             detail=validation.reason,
         )
 
-    result = await workflow_service.start_workflow(db, current_user.id, data.topic)
+    result = await workflow_service.start_workflow(
+        db,
+        current_user.id, 
+        data.topic,
+        overrides={
+        "preferred_tone": data.tone,
+        "preferred_style": data.style,
+        "technical_depth": data.technical_depth,
+        "preferred_language": data.language,
+        "preferred_word_count": data.word_count,
+    },
+    )
 
     return WorkflowStartResponse(
         job_id=result["job_id"],
