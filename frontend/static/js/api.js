@@ -108,7 +108,7 @@ const API = {
   getBlogTokens: (id)    => API.get(`/blogs/${id}/tokens`),
 
   // Workflow
-  startWorkflow:  (topic) => API.post('/workflow/start', { topic }),
+  startWorkflow:  (data) => API.post('/workflow/start', data),
   workflowStatus: (jobId) => API.get(`/workflow/${jobId}`),
   approvePlan:    (jobId) => API.post(`/workflow/${jobId}/approve-plan`, {}),
   editPlan:       (jobId, plan) => API.post('/workflow/' + jobId + '/edit-plan', plan),

@@ -299,7 +299,18 @@
       '<span class="spinner"></span> Validating topic & starting workflow...';
 
     try {
-      const result = await API.startWorkflow(topic);
+      const payload = {
+        topic,
+        tone: document.getElementById('tone').value || null,
+        style: document.getElementById('style').value || null,
+        technical_depth: document.getElementById('depth').value || null,
+        language: document.getElementById('language').value || null,
+        word_count: Number(document.getElementById('word-count').value) || null,
+      };
+
+      console.log(payload);
+
+      const result = await API.startWorkflow(payload);
 
       Toast.success(
         'Plan generated successfully! Redirecting to approval...'
@@ -311,15 +322,16 @@
       }, 800);
 
     } catch (err) {
+      console.error(err);
 
-      // FastAPI validation / topic judge rejection
-      const message =
-        err?.response?.data?.detail ||
-        err?.detail ||
-        err?.message ||
-        'Unable to start workflow';
+      const detail = err?.response?.data?.detail;
+
+      const message = Array.isArray(detail)
+        ? detail.map(e => e.msg).join(", ")
+        : detail || err?.message || JSON.stringify(err);
 
       Toast.error(message);
+
 
       btn.disabled = false;
 
