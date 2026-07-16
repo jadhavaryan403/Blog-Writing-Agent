@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # ── OpenAI ───────────────────────────────────────────────────────────────
+    # ── LLMs ───────────────────────────────────────────────────────────────
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY")
     GROQ_MODEL: str = "openai/gpt-oss-120b"
     GROQ_TEMPERATURE: float = 0.5
