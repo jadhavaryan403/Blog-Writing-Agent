@@ -3,7 +3,9 @@
  * ─────────────────
  * Centralised API client for all backend calls.
  * Handles: auth headers, token refresh, error parsing, toast notifications.
- * Upgraded with a high-fidelity, block-based Cyberpunk Markdown Engine.
+ * Design: Minimalist Monochrome — sharp, instant, black & white only.
+ * NOTE: All endpoint paths and function signatures are backend contracts.
+ * Do not change paths without updating backend routers.
  */
 
 const BASE = '/api/v1';
@@ -23,25 +25,28 @@ const Auth = {
   isLoggedIn: () => !!localStorage.getItem('access_token'),
 };
 
-// ── Toast notifications ───────────────────────────────────────────────────────
+// ── Toast notifications (monochrome, instant) ─────────────────────────────────
 const Toast = {
   container: null,
   init() {
     if (!this.container) {
-      this.container = document.createElement('div');
-      this.container.id = 'toast-container';
-      document.body.appendChild(this.container);
+      this.container = document.getElementById('toast-container') || (() => {
+        const c = document.createElement('div');
+        c.id = 'toast-container';
+        document.body.appendChild(c);
+        return c;
+      })();
     }
   },
   show(message, type = 'info', duration = 4000) {
     this.init();
-    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    const icons = { success: '✓', error: '✕', info: '§' };
     const el = document.createElement('div');
     el.className = `toast ${type}`;
-    el.innerHTML = `<span>${icons[type] || icons.info}</span><span>${message}</span>`;
+    el.setAttribute('role', 'status');
+    el.innerHTML = `<span aria-hidden="true">${icons[type] || icons.info}</span><span>${message}</span>`;
     this.container.appendChild(el);
-    setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(120%)';
-      setTimeout(() => el.remove(), 300); }, duration);
+    setTimeout(() => { el.remove(); }, duration);
   },
   success: (msg) => Toast.show(msg, 'success'),
   error:   (msg) => Toast.show(msg, 'error'),
@@ -152,36 +157,73 @@ function statusBadge(status) {
     completed: 'badge-completed', error: 'badge-error',
   };
   const cls = map[status] || 'badge-pending';
-  return `<span class="badge ${cls}">${status.replace(/_/g,' ')}</span>`;
+  const label = String(status || 'pending').replace(/_/g, ' ');
+  return `<span class="badge ${cls}">${label}</span>`;
 }
 
-// Sidebar active state
+// Sidebar / masthead active state (supports .nav-item and .masthead-nav a)
 function setActiveNav() {
   const page = window.location.pathname;
-  document.querySelectorAll('.nav-item').forEach(el => {
+  document.querySelectorAll('.nav-item, .masthead-nav a').forEach(el => {
     el.classList.toggle('active', el.getAttribute('href') === page);
   });
 }
 
-// Render user info in sidebar
+// Render user info in sidebar/masthead (supports both legacy + new markup)
 async function renderSidebarUser() {
   try {
     const user = await API.me();
-    const el = document.getElementById('sidebar-user');
-    if (el) {
-      el.querySelector('.user-name').textContent = user.name;
-      el.querySelector('.user-email').textContent = user.email;
-      el.querySelector('.avatar').textContent = user.name[0].toUpperCase();
+    const initial = (user.name || 'E')[0].toUpperCase();
+    const wrap = document.getElementById('sidebar-user');
+    if (wrap) {
+      const n = wrap.querySelector('.user-name');
+      const e = wrap.querySelector('.user-email');
+      const a = wrap.querySelector('.avatar');
+      if (n) n.textContent = user.name;
+      if (e) e.textContent = user.email;
+      if (a) a.textContent = initial;
     }
+    const av2 = document.getElementById('user-avatar');
+    if (av2) av2.textContent = initial;
+    document.querySelectorAll('.user-name').forEach(el => { el.textContent = user.name; });
+    document.querySelectorAll('.user-email').forEach(el => { el.textContent = user.email; });
   } catch {}
 }
+
+// Masthead date: "02 OCT 2026 — VOL. 01"
+function renderMastheadDate() {
+  const els = document.querySelectorAll('[data-masthead-date]');
+  if (!els.length) return;
+  const s = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+  els.forEach(el => { el.textContent = s; });
+}
+document.addEventListener('DOMContentLoaded', renderMastheadDate);
 
 function logout() {
   Auth.clear();
   window.location.href = '/login';
 }
 
-// ── Flawless Cyberpunk Markdown Renderer (Block-Based Lexer Architecture) ─────
+// ── Editorial Markdown Renderer (marked + monochrome post-process) ────────────
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 function renderMarkdown(md) {
-  return marked.parse(md);
+  const src = String(md || '');
+  if (window.marked) {
+    try {
+      if (typeof marked.parse === 'function') return marked.parse(src);
+      if (typeof marked === 'function') return marked(src);
+    } catch {}
+  }
+  // Minimal fallback: headings, bold/italic, links, paragraphs, rules.
+  return escapeHtml(src)
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/^---$/gm, '<hr>')
+    .split(/\n{2,}/).map(b => /^<h|^<hr/.test(b.trim()) ? b : `<p>${b.replace(/\n/g, '<br>')}</p>`).join('\n');
 }

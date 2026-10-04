@@ -3,24 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Blog Platform</title>
+  <title>BlogAI — AI Blog Generator</title>
+  <meta name="description" content="Plan, approve, and publish AI-written blogs with human review." />
   <link rel="stylesheet" href="static/css/main.css" />
 </head>
 <body>
-  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center">
-    <div style="text-align:center">
-      <div style="font-size:2rem;font-weight:700;background:linear-gradient(135deg,#6c63ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">
-        ✦ BlogAI
-      </div>
-      <p style="color:var(--text-muted);font-size:.9rem">Redirecting…</p>
-    </div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="clay-blobs" aria-hidden="true">
+    <div class="clay-blob clay-blob-1"></div>
+    <div class="clay-blob clay-blob-2"></div>
+    <div class="clay-blob clay-blob-3"></div>
   </div>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="masthead-brand" href="/">BlogAI</a>
+      <nav class="masthead-nav" aria-label="Primary">
+        <a href="/login" id="nav-auth">Sign in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content" id="main">
+    <div class="container">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="orb-row" aria-hidden="true">
+            <span class="orb orb-violet"></span>
+            <span class="orb orb-pink"></span>
+            <span class="orb orb-sky"></span>
+          </div>
+          <h1>Blogs that <span class="clay-gradient-text">write themselves.</span><br />You approve every word.</h1>
+          <p class="lead" style="margin-top:16px;">Describe a topic. Review the AI-drafted outline. Get a finished, editable blog.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+            <a href="/register" class="btn btn-primary" id="cta-primary">Get started</a>
+            <a href="/login" class="btn btn-secondary" id="cta-secondary">Sign in</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-pad">
+        <div class="how-steps">
+          <div class="how-step"><span class="step-num">1</span><span><strong>Describe</strong> your topic and preferences.</span></div>
+          <div class="how-step"><span class="step-num">2</span><span><strong>Approve</strong> the AI-generated outline.</span></div>
+          <div class="how-step"><span class="step-num">3</span><span><strong>Read &amp; edit</strong> each section.</span></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
   <script src="static/js/api.js"></script>
   <script>
+    // Logged-in users skip the landing page entirely.
     if (Auth.isLoggedIn()) {
       window.location.href = '/dashboard';
-    } else {
-      window.location.href = '/login';
     }
   </script>
 </body>

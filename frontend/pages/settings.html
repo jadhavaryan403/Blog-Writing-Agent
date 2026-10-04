@@ -3,423 +3,248 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Settings — AI Blog Platform</title>
+  <title>Settings — BlogAI</title>
   <link rel="stylesheet" href="../static/css/main.css" />
-  <style>
-    .settings-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    @media (max-width: 700px) { .settings-grid { grid-template-columns: 1fr; } }
-
-    .section-title {
-      font-size: .65rem;
-      text-transform: uppercase;
-      letter-spacing: .14em;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      font-weight: 600;
-      font-family: var(--font-mono);
-    }
-
-    .pref-summary {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 24px;
-    }
-    .pref-chip {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: .74rem;
-      background: var(--accent-dim);
-      border: 1px solid var(--border-accent);
-      font-family: var(--font-mono);
-    }
-    .pref-chip-key { color: var(--text-muted); }
-    .pref-chip-val { color: var(--accent); font-weight: 600; }
-
-    .card.saved-flash {
-      border-color: rgba(34,197,94,0.40) !important;
-      box-shadow: 0 0 0 1px rgba(34,197,94,0.15), 0 2px 20px rgba(0,0,0,0.40) !important;
-      transition: border-color .3s, box-shadow .3s;
-    }
-
-    .field-hint {
-      font-size: .74rem;
-      color: var(--text-muted);
-      margin-top: 5px;
-      line-height: 1.5;
-    }
-
-    .wc-track { position: relative; margin-top: 10px; }
-    .wc-track input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-      height: 4px;
-      border: none;
-      background: transparent;
-      padding: 0;
-    }
-    .wc-labels { display: flex; justify-content: space-between; margin-top: 6px; }
-    .wc-badge {
-      display: inline-block;
-      background: var(--accent);
-      color: #fff;
-      font-size: .78rem;
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 999px;
-      min-width: 88px;
-      text-align: center;
-      font-family: var(--font-mono);
-      box-shadow: 0 0 10px rgba(94,106,210,0.35);
-    }
-
-    .updated-line {
-      font-size: .74rem;
-      color: var(--text-muted);
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .updated-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--success);
-      display: inline-block;
-      box-shadow: 0 0 6px rgba(34,197,94,0.5);
-    }
-
-    /* Profile avatar (larger) */
-    .profile-avatar-lg {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #a78bfa);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; font-weight: 600; color: white;
-      flex-shrink: 0;
-      box-shadow: 0 0 0 1px rgba(94,106,210,0.40), 0 4px 16px rgba(94,106,210,0.25);
-    }
-  </style>
 </head>
 <body>
-<!-- Ambient blobs -->
-<div class="ambient-blobs">
-  <div class="blob blob-primary"></div>
-  <div class="blob blob-secondary"></div>
-  <div class="blob blob-tertiary"></div>
-</div>
+  <a class="skip-link" href="#prefs-form">Skip to settings</a>
+  <div class="clay-blobs" aria-hidden="true">
+    <div class="clay-blob clay-blob-1"></div>
+    <div class="clay-blob clay-blob-2"></div>
+    <div class="clay-blob clay-blob-3"></div>
+  </div>
 
-<div class="page">
-
-  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-text">✦ BlogAI</div>
-      <div class="logo-sub">Generation Platform</div>
-    </div>
-    <nav>
-      <a class="nav-item" href="/dashboard">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-        </svg>
-        Dashboard
-      </a>
-      <a class="nav-item" href="/create">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-        </svg>
-        New Blog
-      </a>
-      <a class="nav-item active" href="/settings">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
-        Settings
-      </a>
-    </nav>
-  </aside>
-
-  <!-- ── Main ────────────────────────────────────────────────────────────── -->
-  <main class="main-content">
-    <div style="max-width:720px">
-
-      <div style="margin-bottom:28px">
-        <h1 style="font-size:1.5rem;letter-spacing:-0.03em">Settings</h1>
-        <p style="color:var(--text-muted);font-size:.85rem;margin-top:5px">
-          Manage your account and writing preferences used by the AI agents.
-        </p>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="masthead-brand" href="/">BlogAI</a>
+      <nav class="masthead-nav" aria-label="Primary">
+        <a class="nav-item" href="/dashboard">Dashboard</a>
+        <a class="nav-item" href="/create">New blog</a>
+        <a class="nav-item active" href="/settings">Settings</a>
+      </nav>
+      <div class="masthead-user" id="sidebar-user">
+        <span class="user-chip"><span class="avatar" id="user-avatar">·</span><span><span class="user-name">—</span><span class="user-email">—</span></span></span>
+        <a class="link-logout" href="#" onclick="logout();return false;">Log out</a>
       </div>
+    </div>
+  </header>
 
-      <!-- ── Writing Preferences card ────────────────────────────────────── -->
-      <div class="card" id="prefs-card">
-        <p class="section-title">Writing Preferences</p>
-        <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:18px">
-          These are injected into the <strong style="color:var(--text-primary);font-weight:500">Planner</strong>
-          and <strong style="color:var(--text-primary);font-weight:500">Writer</strong> agents for every blog
-          you generate. Changes take effect on the next run.
-        </p>
+  <main class="main-content">
+    <div class="container" style="max-width:48rem;">
+      <section class="hero">
+        <div class="hero-card">
+          <p class="eyebrow">Defaults for every blog</p>
+          <h1>Writing settings</h1>
+        </div>
+      </section>
 
-        <!-- Current values summary -->
+      <section>
         <div id="pref-summary-wrap" style="display:none">
-          <div style="font-size:.72rem;color:var(--text-muted);margin-bottom:6px;font-weight:600;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em">
-            ✦ Active preferences
-          </div>
           <div class="pref-summary" id="pref-summary"></div>
         </div>
 
-        <!-- Spinner while loading -->
-        <div id="prefs-loading" style="text-align:center;padding:36px">
-          <span class="spinner" style="width:28px;height:28px;border-width:2px"></span>
-          <p style="color:var(--text-muted);font-size:.83rem;margin-top:12px">Loading preferences…</p>
-        </div>
-
-        <!-- Form (revealed after load) -->
-        <form id="prefs-form" onsubmit="savePrefs(event)">
-
-          <div class="settings-grid">
-            <div class="form-group">
-              <label for="tone">Writing Tone</label>
-              <select id="tone">
-                <option value="professional">Professional</option>
-                <option value="conversational">Conversational</option>
-                <option value="technical">Technical</option>
-                <option value="casual">Casual</option>
-                <option value="persuasive">Persuasive</option>
-                <option value="academic">Academic</option>
-              </select>
-              <p class="field-hint">Sets the overall voice and personality of the writing.</p>
-            </div>
-
-            <div class="form-group">
-              <label for="style">Writing Style</label>
-              <select id="style">
-                <option value="informative">Informative</option>
-                <option value="tutorial">Tutorial / How-To</option>
-                <option value="opinion">Opinion Piece</option>
-                <option value="listicle">Listicle</option>
-                <option value="deep-dive">Deep Dive</option>
-                <option value="news">News / Journalistic</option>
-              </select>
-              <p class="field-hint">Controls the structural format and flow of the blog.</p>
-            </div>
-
-            <div class="form-group">
-              <label for="depth">Technical Depth</label>
-              <select id="depth">
-                <option value="beginner">Beginner — simple language, no jargon</option>
-                <option value="intermediate">Intermediate — balanced detail</option>
-                <option value="advanced">Advanced — assumes domain knowledge</option>
-                <option value="expert">Expert — highly technical, research-level</option>
-              </select>
-              <p class="field-hint">Adjusts how much jargon and depth the writer uses.</p>
-            </div>
-
-            <div class="form-group">
-              <label for="language">Output Language</label>
-              <select id="language">
-                <option value="English">English</option>
-                <option value="Spanish">Spanish</option>
-                <option value="French">French</option>
-                <option value="German">German</option>
-                <option value="Portuguese">Portuguese</option>
-                <option value="Japanese">Japanese</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Arabic">Arabic</option>
-                <option value="Korean">Korean</option>
-              </select>
-              <p class="field-hint">All agents will produce content in this language.</p>
-            </div>
+        <div class="card lift" id="prefs-card">
+          <div id="prefs-loading" style="text-align:center;padding:36px;">
+            <span class="spinner" style="width:28px;height:28px;" aria-hidden="true"></span>
+            <p class="eyebrow" style="margin-top:12px;">Loading…</p>
           </div>
 
-          <!-- Word count slider -->
-          <div class="form-group" style="margin-top:4px">
-            <label for="word-count">
-              Default Target Word Count
-              <span id="wc-badge" class="wc-badge" style="margin-left:10px;vertical-align:middle">1 500 words</span>
-            </label>
-            <div class="wc-track">
-              <input type="range" id="word-count" min="500" max="5000" step="100"
-                oninput="onWcChange(this.value)" />
-              <div class="wc-labels">
-                <span style="font-size:.72rem;color:var(--text-muted)">500 (short)</span>
-                <span style="font-size:.72rem;color:var(--text-muted)">2 500</span>
-                <span style="font-size:.72rem;color:var(--text-muted)">5 000 (long)</span>
+          <form id="prefs-form" onsubmit="savePrefs(event)">
+            <div class="settings-grid">
+              <div class="form-group">
+                <label for="tone">Tone</label>
+                <select id="tone">
+                  <option value="professional">Professional</option>
+                  <option value="conversational">Conversational</option>
+                  <option value="technical">Technical</option>
+                  <option value="casual">Casual</option>
+                  <option value="persuasive">Persuasive</option>
+                  <option value="academic">Academic</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="style">Style</label>
+                <select id="style">
+                  <option value="informative">Informative</option>
+                  <option value="tutorial">Tutorial / How-To</option>
+                  <option value="opinion">Opinion Piece</option>
+                  <option value="listicle">Listicle</option>
+                  <option value="deep-dive">Deep Dive</option>
+                  <option value="news">News / Journalistic</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="depth">Technical depth</label>
+                <select id="depth">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                  <option value="expert">Expert</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="language">Language</label>
+                <select id="language">
+                  <option value="English">English</option>
+                  <option value="Spanish">Spanish</option>
+                  <option value="French">French</option>
+                  <option value="German">German</option>
+                  <option value="Portuguese">Portuguese</option>
+                  <option value="Japanese">Japanese</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="Arabic">Arabic</option>
+                  <option value="Korean">Korean</option>
+                </select>
               </div>
             </div>
-            <p class="field-hint">The Planner will distribute this word count across sections.</p>
-          </div>
 
-          <!-- Divider -->
-          <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);margin:22px 0"></div>
+            <div class="form-group" style="margin-top:4px">
+              <label for="word-count">Default length <span id="wc-badge" class="wc-badge" style="margin-left:10px;vertical-align:middle">1,500 words</span></label>
+              <div class="wc-track">
+                <input type="range" id="word-count" min="500" max="5000" step="100" oninput="onWcChange(this.value)" />
+                <div class="wc-labels">
+                  <span class="eyebrow">500</span>
+                  <span class="eyebrow">5000</span>
+                </div>
+              </div>
+            </div>
 
-          <!-- Action row -->
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <button type="submit" class="btn btn-primary" id="save-btn">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-              </svg>
-              Save Preferences
-            </button>
-            <button type="button" class="btn btn-secondary" onclick="resetToDefaults()">
-              Reset to Defaults
-            </button>
-            <div id="save-status" style="font-size:.8rem;margin-left:auto"></div>
-          </div>
+            <hr class="divider-soft" />
 
-          <div class="updated-line" id="updated-line" style="display:none">
-            <span class="updated-dot"></span>
-            Last saved: <span id="updated-at"></span>
-          </div>
-        </form>
-      </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <button type="submit" class="btn btn-primary" id="save-btn">Save</button>
+              <button type="button" class="btn btn-secondary" onclick="resetToDefaults()">Reset</button>
+              <div id="save-status" class="eyebrow" style="margin-left:auto"></div>
+            </div>
 
+            <div class="updated-line" id="updated-line" style="display:none">
+              <span class="updated-dot" aria-hidden="true"></span>
+              Saved&nbsp;<span id="updated-at"></span>
+            </div>
+          </form>
+        </div>
+      </section>
     </div>
   </main>
-</div>
 
-<div id="toast-container"></div>
-<script src="../static/js/api.js"></script>
-<script>
-  guardAuth();
+  <div id="toast-container"></div>
+  <script src="../static/js/api.js"></script>
+  <script>
+    guardAuth();
+    setActiveNav();
+    renderSidebarUser();
 
-  
+    const DEFAULTS = {
+      preferred_tone:       'professional',
+      preferred_style:      'informative',
+      technical_depth:      'intermediate',
+      preferred_language:   'English',
+      preferred_word_count: 1500,
+    };
 
-  const DEFAULTS = {
-    preferred_tone:       'professional',
-    preferred_style:      'informative',
-    technical_depth:      'intermediate',
-    preferred_language:   'English',
-    preferred_word_count: 1500,
-  };
-
-  function onWcChange(val) {
-    document.getElementById('wc-badge').textContent = Number(val).toLocaleString() + ' words';
-  }
-
-  const LABELS = {
-    preferred_tone:       { label: 'Tone',     fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    preferred_style:      { label: 'Style',    fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    technical_depth:      { label: 'Depth',    fn: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    preferred_language:   { label: 'Language', fn: v => v },
-    preferred_word_count: { label: 'Words',    fn: v => Number(v).toLocaleString() },
-  };
-
-  function renderSummary(prefs) {
-    const wrap    = document.getElementById('pref-summary-wrap');
-    const summary = document.getElementById('pref-summary');
-    summary.innerHTML = Object.entries(LABELS).map(([key, meta]) => {
-      const val = prefs[key] ?? DEFAULTS[key];
-      return `<div class="pref-chip">
-        <span class="pref-chip-key">${meta.label}:</span>
-        <span class="pref-chip-val">${meta.fn(val)}</span>
-      </div>`;
-    }).join('');
-    wrap.style.display = 'block';
-  }
-
-  function populateForm(p) {
-    const rawDepth = (p.technical_depth || 'intermediate').split(' ')[0].toLowerCase();
-    document.getElementById('tone').value     = p.preferred_tone    || DEFAULTS.preferred_tone;
-    document.getElementById('depth').value    = rawDepth;
-    document.getElementById('language').value = p.preferred_language || DEFAULTS.preferred_language;
-
-    const styleEl  = document.getElementById('style');
-    const styleVal = (p.preferred_style || DEFAULTS.preferred_style).toLowerCase();
-    for (const opt of styleEl.options) {
-      if (opt.value.toLowerCase() === styleVal) { styleEl.value = opt.value; break; }
+    function onWcChange(val) {
+      document.getElementById('wc-badge').textContent = Number(val).toLocaleString() + ' words';
     }
 
-    const wc = p.preferred_word_count || DEFAULTS.preferred_word_count;
-    document.getElementById('word-count').value = wc;
-    onWcChange(wc);
+    const LABELS = {
+      preferred_tone:       { label: 'Tone',     fn: v => String(v).charAt(0).toUpperCase() + String(v).slice(1) },
+      preferred_style:      { label: 'Style',    fn: v => String(v).charAt(0).toUpperCase() + String(v).slice(1) },
+      technical_depth:      { label: 'Depth',    fn: v => String(v).charAt(0).toUpperCase() + String(v).slice(1) },
+      preferred_language:   { label: 'Language', fn: v => v },
+      preferred_word_count: { label: 'Words',    fn: v => Number(v).toLocaleString() },
+    };
 
-    if (p.updated_at) {
-      document.getElementById('updated-line').style.display = 'flex';
-      document.getElementById('updated-at').textContent = formatDate(p.updated_at);
+    function renderSummary(prefs) {
+      const wrap    = document.getElementById('pref-summary-wrap');
+      const summary = document.getElementById('pref-summary');
+      summary.innerHTML = Object.entries(LABELS).map(([key, meta]) => {
+        const val = prefs[key] ?? DEFAULTS[key];
+        return `<div class="pref-chip"><span class="pref-chip-key">${meta.label}</span><span class="pref-chip-val">${meta.fn(val)}</span></div>`;
+      }).join('');
+      wrap.style.display = 'block';
     }
-  }
 
-  async function loadPrefs() {
-    try {
-      const p = await API.getPrefs();
-      document.getElementById('prefs-loading').style.display = 'none';
-      document.getElementById('prefs-form').style.display    = 'block';
-      populateForm(p);
-      console.log("before", document.getElementById('prefs-form'));
+    function populateForm(p) {
+      p = p || {};
+      const rawDepth = String(p.technical_depth || 'intermediate').split(' ')[0].toLowerCase();
+      document.getElementById('tone').value     = p.preferred_tone    || DEFAULTS.preferred_tone;
+      document.getElementById('depth').value    = rawDepth;
+      document.getElementById('language').value = p.preferred_language || DEFAULTS.preferred_language;
+      const styleEl  = document.getElementById('style');
+      const styleVal = String(p.preferred_style || DEFAULTS.preferred_style).toLowerCase();
+      for (const opt of styleEl.options) {
+        if (opt.value.toLowerCase() === styleVal) { styleEl.value = opt.value; break; }
+      }
+      const wc = p.preferred_word_count || DEFAULTS.preferred_word_count;
+      document.getElementById('word-count').value = wc;
+      onWcChange(wc);
+      if (p.updated_at) {
+        document.getElementById('updated-line').style.display = 'flex';
+        document.getElementById('updated-at').textContent = formatDate(p.updated_at);
+      }
+    }
 
-      renderSummary(p);
-
-      console.log("after", document.getElementById('prefs-form'));
-    } catch (err) {
+    async function loadPrefs() {
+      // Show the form immediately with defaults so the page can never
+      // get stuck on "Loading…" if the network is slow or the backend
+      // is unreachable. Server values upgrade the form when they arrive.
       document.getElementById('prefs-loading').style.display = 'none';
       document.getElementById('prefs-form').style.display    = 'block';
       populateForm(DEFAULTS);
       renderSummary(DEFAULTS);
+
+      try {
+        const p = await API.getPrefs();
+        if (p && typeof p === 'object') {
+          populateForm(p);
+          renderSummary(p);
+        }
+      } catch (err) {
+        document.getElementById('save-status').textContent = 'Could not load saved settings';
+        Toast.error('Failed to load settings');
+      }
+    }
+
+    const SAVE_HTML = 'Save';
+    async function savePrefs(e) {
+      e.preventDefault();
+      const btn      = document.getElementById('save-btn');
       const statusEl = document.getElementById('save-status');
-      if (statusEl) statusEl.innerHTML = `<span style="color:var(--error)">Failed to load: ${err.message}</span>`;
-      Toast.error('Failed to load preferences');
+      btn.disabled   = true;
+      btn.textContent = 'Saving…';
+      statusEl.textContent = '';
+      const payload = {
+        preferred_tone:       document.getElementById('tone').value,
+        preferred_style:      document.getElementById('style').value,
+        technical_depth:      document.getElementById('depth').value,
+        preferred_language:   document.getElementById('language').value,
+        preferred_word_count: parseInt(document.getElementById('word-count').value, 10),
+      };
+      try {
+        const updated = await API.updatePrefs(payload);
+        populateForm(updated);
+        renderSummary(updated);
+        const card = document.getElementById('prefs-card');
+        card.classList.add('saved-flash');
+        setTimeout(() => card.classList.remove('saved-flash'), 1200);
+        statusEl.textContent = 'Saved';
+        Toast.success('Settings saved.');
+        setTimeout(() => { statusEl.textContent = ''; }, 4000);
+      } catch (err) {
+        statusEl.textContent = 'Save failed';
+        Toast.error('Save failed: ' + err.message);
+      } finally {
+        btn.disabled  = false;
+        btn.textContent = SAVE_HTML;
+      }
     }
-  }
 
-  async function savePrefs(e) {
-    e.preventDefault();
-    const btn      = document.getElementById('save-btn');
-    const statusEl = document.getElementById('save-status');
-    btn.disabled   = true;
-    btn.innerHTML  = '<span class="spinner"></span> Saving…';
-    statusEl.textContent = '';
-
-    const payload = {
-      preferred_tone:       document.getElementById('tone').value,
-      preferred_style:      document.getElementById('style').value,
-      technical_depth:      document.getElementById('depth').value,
-      preferred_language:   document.getElementById('language').value,
-      preferred_word_count: parseInt(document.getElementById('word-count').value, 10),
-    };
-
-    try {
-      const updated = await API.updatePrefs(payload);
-      populateForm(updated);
-      renderSummary(updated);
-
-      const card = document.getElementById('prefs-card');
-      card.classList.add('saved-flash');
-      setTimeout(() => card.classList.remove('saved-flash'), 1200);
-
-      statusEl.innerHTML = `<span style="color:var(--success)">✓ Saved successfully</span>`;
-      Toast.success('Preferences saved!');
-      setTimeout(() => { statusEl.textContent = ''; }, 4000);
-    } catch (err) {
-      statusEl.innerHTML = `<span style="color:var(--error)">✕ ${err.message}</span>`;
-      Toast.error('Save failed: ' + err.message);
-    } finally {
-      btn.disabled  = false;
-      btn.innerHTML = `
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-        </svg> Save Preferences`;
+    function resetToDefaults() {
+      populateForm(DEFAULTS);
+      document.getElementById('save-status').textContent = 'Defaults loaded — press Save.';
     }
-  }
 
-  function resetToDefaults() {
-    populateForm(DEFAULTS);
-    document.getElementById('save-status').innerHTML =
-      `<span style="color:var(--warning)">⚠ Defaults loaded — click Save to apply.</span>`;
-  }
-
-  loadPrefs();
-</script>
+    loadPrefs();
+  </script>
 </body>
 </html>

@@ -3,209 +3,169 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — AI Blog Platform</title>
+  <title>Dashboard — BlogAI</title>
   <link rel="stylesheet" href="../static/css/main.css" />
-  <style>
-    /* Gradient text for stat values */
-    .stat-value {
-      background: linear-gradient(to bottom, #ffffff, rgba(255,255,255,0.72));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-  </style>
 </head>
 <body>
-<!-- Ambient blobs -->
-<div class="ambient-blobs">
-  <div class="blob blob-primary"></div>
-  <div class="blob blob-secondary"></div>
-  <div class="blob blob-tertiary"></div>
-</div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="clay-blobs" aria-hidden="true">
+    <div class="clay-blob clay-blob-1"></div>
+    <div class="clay-blob clay-blob-2"></div>
+    <div class="clay-blob clay-blob-3"></div>
+  </div>
 
-<div class="page">
-
-  <!-- ── Sidebar ─────────────────────────────────────────────────────────── -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-text">✦ BlogAI</div>
-      <div class="logo-sub">Generation Platform</div>
-    </div>
-
-    <nav>
-      <a class="nav-item active" href="/dashboard">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-        </svg>
-        Dashboard
-      </a>
-      <a class="nav-item" href="/create">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-        </svg>
-        New Blog
-      </a>
-      <a class="nav-item" href="/settings">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-        </svg>
-        Settings
-      </a>
-    </nav>
-
-  </aside>
-
-  <!-- ── Main ────────────────────────────────────────────────────────────── -->
-  <main class="main-content">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
-      <div>
-        <h1 style="font-size:1.5rem;letter-spacing:-0.03em">Dashboard</h1>
-        <p style="color:var(--text-muted);font-size:.85rem;margin-top:4px">Overview of your blog generation activity</p>
-      </div>
-      <a href="/create" class="btn btn-primary">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-        </svg>
-        New Blog
-      </a>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value" id="stat-blogs">—</div>
-        <div class="stat-label">Total Blogs</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-tokens">—</div>
-        <div class="stat-label">Tokens Used</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-cost">—</div>
-        <div class="stat-label">Total Cost</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-latency">—</div>
-        <div class="stat-label">Avg Generation Time</div>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="masthead-brand" href="/">BlogAI</a>
+      <nav class="masthead-nav" aria-label="Primary">
+        <a class="nav-item active" href="/dashboard">Dashboard</a>
+        <a class="nav-item" href="/create">New blog</a>
+        <a class="nav-item" href="/settings">Settings</a>
+      </nav>
+      <div class="masthead-user" id="sidebar-user">
+        <span class="user-chip"><span class="avatar" id="user-avatar">·</span><span><span class="user-name">—</span><span class="user-email">—</span></span></span>
+        <a class="link-logout" href="#" onclick="logout();return false;">Log out</a>
       </div>
     </div>
+  </header>
 
-    <!-- Recent Blogs -->
-    <div class="card">
-      <div class="card-header">
-        <h3 style="font-size:.95rem;letter-spacing:-0.01em">Recent Blogs</h3>
-        <a href="/create" class="btn btn-secondary btn-sm">Generate New</a>
-      </div>
-
-      <div id="blogs-container">
-        <div style="text-align:center;padding:48px">
-          <span class="spinner"></span>
+  <main class="main-content" id="main">
+    <div class="container">
+      <section class="hero">
+        <div class="hero-card" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+          <div>
+            <p class="eyebrow">Your blogs</p>
+            <h1>Dashboard</h1>
+          </div>
+          <a href="/create" class="btn btn-primary">+ New blog</a>
         </div>
-      </div>
+      </section>
+
+      <section>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-orb">B</div><div class="stat-value" id="stat-blogs">—</div><div class="stat-label">Total blogs</div></div>
+          <div class="stat-card"><div class="stat-orb" style="background:linear-gradient(135deg,#7DD3FC,#0EA5E9);">T</div><div class="stat-value" id="stat-tokens">—</div><div class="stat-label">Tokens used</div></div>
+          <div class="stat-card"><div class="stat-orb" style="background:linear-gradient(135deg,#6EE7B7,#10B981);">C</div><div class="stat-value" id="stat-cost">—</div><div class="stat-label">Total cost</div></div>
+          <div class="stat-card"><div class="stat-orb" style="background:linear-gradient(135deg,#F9A8D4,#DB2777);">S</div><div class="stat-value" id="stat-latency">—</div><div class="stat-label">Avg. generation time</div></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card lift" style="padding:0;overflow:hidden;">
+          <div class="card-header" style="padding:28px 28px 0;">
+            <h2>Recent blogs</h2>
+          </div>
+          <div id="blogs-container" style="padding:0 28px 28px;">
+            <div style="text-align:center;padding:48px;">
+              <span class="spinner" aria-hidden="true"></span>
+              <p class="eyebrow" style="margin-top:12px;">Loading…</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
-</div>
 
-<div id="toast-container"></div>
-<script src="../static/js/api.js"></script>
-<script>
-  guardAuth();
+  <div id="toast-container"></div>
+  <script src="../static/js/api.js"></script>
+  <script>
+    guardAuth();
+    setActiveNav();
 
-  async function loadDashboard() {
-    try {
-      const user = await API.me();
-      document.getElementById('user-avatar').textContent = user.name[0].toUpperCase();
-      document.querySelector('.user-name').textContent  = user.name;
-      document.querySelector('.user-email').textContent = user.email;
-    } catch {}
+    async function loadDashboard() {
+      try {
+        const user = await API.me();
+        const av = document.getElementById('user-avatar');
+        if (av) av.textContent = (user.name || '·')[0].toUpperCase();
+        document.querySelectorAll('.user-name').forEach(el => el.textContent = user.name);
+        document.querySelectorAll('.user-email').forEach(el => el.textContent = user.email);
+      } catch {}
 
-    try {
-      const usage = await API.usage();
-      document.getElementById('stat-tokens').textContent  = formatTokens(usage.total_tokens);
-      document.getElementById('stat-cost').textContent    = formatCost(usage.total_cost);
-      document.getElementById('stat-latency').textContent = usage.average_latency
-        ? `${usage.average_latency.toFixed(1)}s` : '—';
-    } catch {}
+      try {
+        const usage = await API.usage();
+        document.getElementById('stat-tokens').textContent  = formatTokens(usage.total_tokens);
+        document.getElementById('stat-cost').textContent    = formatCost(usage.total_cost);
+        document.getElementById('stat-latency').textContent = usage.average_latency
+          ? `${usage.average_latency.toFixed(1)}s` : '—';
+      } catch {}
 
-    try {
-      const data = await API.listBlogs();
-      document.getElementById('stat-blogs').textContent = data.total;
-      renderBlogs(data.items);
-    } catch (err) {
-      document.getElementById('blogs-container').innerHTML =
-        `<p style="color:var(--error);padding:20px">${err.message}</p>`;
+      try {
+        const data = await API.listBlogs();
+        document.getElementById('stat-blogs').textContent = data.total;
+        renderBlogs(data.items);
+      } catch (err) {
+        document.getElementById('blogs-container').innerHTML =
+          `<p style="padding:20px;">${err.message}</p>`;
+      }
     }
-  }
 
-  function renderBlogs(blogs) {
-    const el = document.getElementById('blogs-container');
-    if (!blogs.length) {
+    function renderBlogs(blogs) {
+      const el = document.getElementById('blogs-container');
+      if (!blogs.length) {
+        el.innerHTML = `
+          <div class="empty-state">
+            <h3 style="margin-bottom:8px;">No blogs yet</h3>
+            <p style="margin-bottom:20px;">Create your first AI-generated blog.</p>
+            <a href="/create" class="btn btn-primary">Get started</a>
+          </div>`;
+        return;
+      }
       el.innerHTML = `
-        <div class="empty-state">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          <h3 style="color:var(--text-primary);margin-bottom:8px;font-size:1rem;letter-spacing:-0.01em">No blogs yet</h3>
-          <p style="margin-bottom:20px;font-size:.85rem">Generate your first AI-powered blog post.</p>
-          <a href="/create" class="btn btn-primary">Get Started</a>
-        </div>`;
-      return;
-    }
-
-    el.innerHTML = `
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Title / Topic</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${blogs.map(b => `
+        <div class="table-wrap" style="box-shadow:none;">
+          <table>
+            <thead>
               <tr>
-                <td>
-                  <div style="font-weight:500;color:var(--text-primary);letter-spacing:-0.01em">${b.title || '(Untitled)'}</div>
-                  <div style="font-size:.78rem;color:var(--text-muted);margin-top:2px">${b.topic}</div>
-                </td>
-                <td>${statusBadge(b.status)}</td>
-                <td style="font-size:.82rem">${formatDate(b.created_at)}</td>
-                <td>
-                  <div style="display:flex;gap:8px">
-                    ${b.status === 'completed'
-                      ? `<a href="/viewer?id=${b.id}" class="btn btn-secondary btn-sm">View</a>`
-                      : b.status === 'awaiting_approval'
-                        ? `<a href="/approval?blog_id=${b.id}" class="btn btn-primary btn-sm">Approve Plan</a>`
-                        : b.status === 'running'
-                          ? `<a href="/approval?blog_id=${b.id}" class="btn btn-secondary btn-sm">Track</a>`
-                          : ''}
-                    <button onclick="deleteBlog(${b.id}, this)" class="btn btn-danger btn-sm">Delete</button>
-                  </div>
-                </td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  }
-
-  async function deleteBlog(id, btn) {
-    if (!confirm('Delete this blog? This cannot be undone.')) return;
-    btn.disabled = true;
-    try {
-      await API.deleteBlog(id);
-      Toast.success('Blog deleted');
-      loadDashboard();
-    } catch (err) {
-      Toast.error(err.message);
-      btn.disabled = false;
+                <th>Title / Topic</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${blogs.map((b) => `
+                <tr>
+                  <td>
+                    <div class="blog-title">${escapeRow(b.title) || '(Untitled)'}</div>
+                    <div class="blog-topic">${escapeRow(b.topic)}</div>
+                  </td>
+                  <td>${statusBadge(b.status)}</td>
+                  <td style="font-size:.85rem;color:var(--clay-muted);">${formatDate(b.created_at)}</td>
+                  <td>
+                    <div class="row-actions">
+                      ${b.status === 'completed'
+                        ? `<a href="/viewer?id=${b.id}" class="btn btn-secondary btn-sm">View</a>`
+                        : b.status === 'awaiting_approval'
+                          ? `<a href="/approval?blog_id=${b.id}" class="btn btn-primary btn-sm">Review</a>`
+                          : b.status === 'running'
+                            ? `<a href="/approval?blog_id=${b.id}" class="btn btn-secondary btn-sm">Track</a>`
+                            : ''}
+                      <button onclick="deleteBlog(${b.id}, this)" class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
     }
-  }
 
-  loadDashboard();
-</script>
+    function escapeRow(s) {
+      return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    async function deleteBlog(id, btn) {
+      if (!confirm('Delete this blog? This cannot be undone.')) return;
+      btn.disabled = true;
+      try {
+        await API.deleteBlog(id);
+        Toast.success('Blog deleted.');
+        loadDashboard();
+      } catch (err) {
+        Toast.error(err.message);
+        btn.disabled = false;
+      }
+    }
+
+    loadDashboard();
+  </script>
 </body>
 </html>
