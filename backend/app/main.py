@@ -8,7 +8,7 @@ Architecture decisions:
 - CORS configured from settings for security.
 - Tracing middleware on every request.
 - All routers prefixed with /api/v1 for clean versioning.
-- Static files served for the frontend at /app (when present).
+- Static files served for the frontend at / (built React app in frontend/dist).
 """
 
 from __future__ import annotations
@@ -85,12 +85,13 @@ async def health():
     return {"status": "ok", "env": settings.APP_ENV}
 
 
-# ── Serve frontend static files ───────────────────────────────────────────────
-# Mount AFTER API routes so /api/* always wins.
+# ── Serve built React frontend ────────────────────────────────────────────────
+# Mount AFTER API routes so /api/* always wins. Page routes (/login, /dashboard,
+# …) are handled by the pages router, which returns the SPA shell.
 try:
     app.mount(
         "/",
-        StaticFiles(directory=str(FRONTEND_DIR), html=True),
+        StaticFiles(directory=str(FRONTEND_DIR / "dist"), html=True),
         name="frontend"
     )
 except Exception as e:
