@@ -7,7 +7,7 @@
  * Do not change paths without updating backend routers.
  */
 
-const BASE = '/api/v1';
+const BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
 
 // ── Token management ──────────────────────────────────────────────────────────
 export const Auth = {
