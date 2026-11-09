@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send HTTP request
-        run: curl -f https://blog-writing-agent-j2ds.onrender.com/
+        run: curl -f https://blog-writing-agent-j2ds.onrender.com/health
