@@ -21,6 +21,7 @@ async def run_image_search(state: BlogState) -> dict:
     queries = state.get("image_queries", [])
     image_results: list[ImageResultDict] = []
 
+
     for query_item in queries:
         section_idx = query_item.get("section_idx", 0)
         query = query_item.get("query", "")
@@ -56,10 +57,12 @@ async def run_image_search(state: BlogState) -> dict:
                 alt_text=f"Image not available: {exc}",
             ))
 
+
     latency = time.monotonic() - t0
     metrics = state.get("metrics", {})
     node_latencies = dict(metrics.get("node_latencies", {}))
     node_latencies["image_search"] = latency
+
 
     return {
         "image_results": image_results,

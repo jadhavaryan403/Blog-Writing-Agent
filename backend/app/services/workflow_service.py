@@ -17,15 +17,23 @@ import asyncio
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Optional
+import logging
+import traceback
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.session import AsyncSessionLocal
 
 from app.db.models.blog import Blog, WorkflowState, UserPreference
 from app.langgraph.graph import compiled_graph
 from app.langgraph.state import BlogState
 from app.schemas import PlanSchema, SectionSchema, WorkflowStatusResponse
 
+
+logger = logging.getLogger(__name__)
+
+_background_tasks: set[asyncio.Task] = set()
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -129,10 +137,29 @@ async def start_workflow(
     config = {"configurable": {"thread_id": job_id}}
     final_state: BlogState = {}
 
-    async for event in compiled_graph.astream(initial_state, config=config):
-        for node_name, node_output in event.items():
-            if isinstance(node_output, dict):
-                final_state.update(node_output)
+    try:
+        async for event in compiled_graph.astream(initial_state, config=config):
+            print("\n========== GRAPH EVENT ==========")
+            print("EVENT:", event)
+
+            for node_name, node_output in event.items():
+                print(f"\n>>> NODE COMPLETED: {node_name}")
+
+                if isinstance(node_output, dict):   
+                    print("STATUS:", node_output.get("status"))
+                    print("CURRENT NODE:", node_output.get("current_node"))
+                    print("KEYS:", list(node_output.keys()))
+                    final_state.update(node_output)
+
+    except Exception as exc:
+        import traceback
+
+        print("\n\n========== GRAPH FAILED ==========")
+        print(f"ERROR TYPE: {type(exc).__name__}")
+        print(f"ERROR: {exc}")
+        traceback.print_exc()
+
+        raise 
 
     # 5. Persist state snapshot
     await _upsert_workflow_state(db, blog.id, job_id, final_state)
@@ -235,38 +262,33 @@ async def approve_plan(
     )
     await db.commit()
 
-    # Resume graph execution in background
-    asyncio.create_task(_run_to_completion(db, job_id, row.blog_id, config))
+    task = asyncio.create_task(_run_to_completion(job_id, row.blog_id, config))
+    _background_tasks.add(task)                     
+    task.add_done_callback(_background_tasks.discard)
 
     return {"job_id": job_id, "status": "running", "message": "Workflow resumed"}
 
 
-async def _run_to_completion(
-    db: AsyncSession,
-    job_id: str,
-    blog_id: int,
-    config: dict,
-) -> None:
-    """Background task: run graph to completion and persist each step."""
-    try:
-        final_state: BlogState = {}
-        async for event in compiled_graph.astream(None, config=config):
-            for node_name, node_output in event.items():
-                if isinstance(node_output, dict):
-                    final_state.update(node_output)
-                    # Persist after every node
-                    async with db.begin():
-                        await _upsert_workflow_state(db, blog_id, job_id, final_state)
-    except Exception as exc:
-        # Mark as error
-        async with db.begin():
+async def _run_to_completion(job_id: str, blog_id: int, config: dict) -> None:
+    """Background task: run graph to completion, persisting full state after each step."""
+    async with AsyncSessionLocal() as db:           # own session, not the request's
+        try:
+            async for event in compiled_graph.astream(None, config=config):
+                logger.info("nodes completed: %s", list(event.keys()))
+
+                # Persist the full merged state, not the per-node delta
+                snapshot = await compiled_graph.aget_state(config)
+                await _upsert_workflow_state(db, blog_id, job_id, snapshot.values)
+
+        except Exception:
+            logger.error("Workflow %s failed:\n%s", job_id, traceback.format_exc())
+            await db.rollback()
             await db.execute(
                 update(WorkflowState)
                 .where(WorkflowState.job_id == job_id)
                 .values(status="error")
             )
             await db.execute(
-                update(Blog)
-                .where(Blog.id == blog_id)
-                .values(status="error")
+                update(Blog).where(Blog.id == blog_id).values(status="error")
             )
+            await db.commit()

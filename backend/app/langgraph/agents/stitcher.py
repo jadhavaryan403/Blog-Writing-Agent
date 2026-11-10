@@ -93,6 +93,16 @@ def _deduplicate_citations(citations: list[CitationDict]) -> list[CitationDict]:
 
 async def run_stitcher(state: BlogState) -> dict:
     """LangGraph node: Stitch Blog."""
+
+    print("\n========== STITCHER INPUT ==========")
+    print("section count:", len(state.get("sections", [])))
+    print("draft count:", len(state.get("section_drafts", [])))
+    print("image results:", len(state.get("image_results", [])))
+    print("image_results:")
+    for img in state.get("image_results", []):
+        print(img)
+    print("====================================\n")
+
     t0 = time.monotonic()
 
     final_blog = _build_final_blog(state)
