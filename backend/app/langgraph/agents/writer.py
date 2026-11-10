@@ -137,8 +137,6 @@ async def run_writer(state: BlogState) -> dict:
     node_token = dict(metrics.get("node_token", {}))
     node_token["writer"] = total_tokens
 
-    print(state.get("metrics", {}).get("node_latencies", {}))
-    print(state.get("metrics", {}).get("node_token", {}))
 
     return {
         "sections": updated_sections,
@@ -147,8 +145,6 @@ async def run_writer(state: BlogState) -> dict:
         "current_node": "image_planner",
         "metrics": {
             **metrics,
-            "total_tokens": metrics.get("total_tokens", 0) + total_tokens,
-            "total_cost": metrics.get("total_cost", 0.0) + cost,
             "node_latencies": node_latencies,
             "node_token": node_token
         },

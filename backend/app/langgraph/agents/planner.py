@@ -103,8 +103,6 @@ async def run_planner(state: BlogState) -> dict:
     node_token = metrics.get("node_token", {})
     node_token["planner"] = tokens
 
-    print(state.get("metrics", {}).get("node_latencies", {}))
-    print(state.get("metrics", {}).get("node_token", {}))
 
     return {
         "title": plan["title"],
@@ -116,8 +114,6 @@ async def run_planner(state: BlogState) -> dict:
         "current_node": "human_approval",
         "metrics": {
             **metrics,
-            "total_tokens": metrics.get("total_tokens", 0) + tokens,
-            "total_cost": metrics.get("total_cost", 0.0) + cost,
             "node_latencies": node_latencies,
             "node_token": node_token
         },

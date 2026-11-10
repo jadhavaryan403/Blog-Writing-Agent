@@ -78,8 +78,13 @@ async def run_persist(state: BlogState) -> dict:
         if user_id:
             result = await db.execute(select(UsageMetric).where(UsageMetric.user_id == user_id))
             usage_row = result.scalar_one_or_none()
-            total_tokens = metrics.get("total_tokens", 0)
-            total_cost = metrics.get("total_cost", 0.0)
+            
+            node_tokens = metrics.get("node_token", {})
+            node_latencies = metrics.get("node_latencies", {})
+
+            total_tokens = sum(node_tokens.values())
+            total_cost = total_tokens * 0.25 / 1_000_000
+
             total_latency = sum(node_latencies.values())
 
             if usage_row:
@@ -88,6 +93,13 @@ async def run_persist(state: BlogState) -> dict:
                     (usage_row.average_latency * usage_row.total_requests + total_latency)
                     / new_count
                 )
+
+                print("\n\n\n================================================")
+                print("Usage metric historically:", usage_row.total_requests, usage_row.total_tokens, usage_row.total_cost)
+
+                print("Usage metric new:", new_count, usage_row.total_tokens + total_tokens, usage_row.total_cost + total_cost)
+                print("=================================================\n\n\n")
+
                 await db.execute(
                     update(UsageMetric)
                     .where(UsageMetric.user_id == user_id)

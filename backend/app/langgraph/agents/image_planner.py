@@ -74,8 +74,6 @@ async def run_image_planner(state: BlogState) -> dict:
     node_token = dict(metrics.get("node_token", {}))
     node_token["image_planner"] = tokens
 
-    print(state.get("metrics", {}).get("node_latencies", {}))
-    print(state.get("metrics", {}).get("node_token", {}))
 
     return {
         "image_queries": image_queries,
@@ -83,8 +81,6 @@ async def run_image_planner(state: BlogState) -> dict:
         "current_node": "image_search",
         "metrics": {
             **metrics,
-            "total_tokens": metrics.get("total_tokens", 0) + tokens,
-            "total_cost": metrics.get("total_cost", 0.0) + tokens * 0.25 / 1_000_000,
             "node_latencies": node_latencies,
             "node_token": node_token,
         },

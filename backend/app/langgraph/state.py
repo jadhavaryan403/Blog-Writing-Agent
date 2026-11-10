@@ -65,8 +65,6 @@ def last_value(a, b):
 def merge_metrics(a: dict | None, b: dict | None) -> dict:
     a, b = a or {}, b or {}
     return {
-        "total_tokens": a.get("total_tokens", 0) + b.get("total_tokens", 0),
-        "total_cost": a.get("total_cost", 0.0) + b.get("total_cost", 0.0),
         "node_latencies": {**a.get("node_latencies", {}), **b.get("node_latencies", {})},
         "node_token": {**a.get("node_token", {}), **b.get("node_token", {})},
     }
