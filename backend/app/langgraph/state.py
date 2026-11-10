@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any, Optional
-from typing_extensions import TypedDict
+from typing import Annotated, TypedDict
 
 
 # ── Sub-structure helpers (plain dicts — serialisable to JSON) ────────────────
@@ -57,6 +57,20 @@ class MetricsDict(TypedDict, total=False):
     node_token: dict[str, int]   # node_name → tokens used
 
 
+
+def last_value(a, b):
+    """Keep the newest non-None value when parallel nodes both write the key."""
+    return b if b is not None else a
+
+def merge_metrics(a: dict | None, b: dict | None) -> dict:
+    a, b = a or {}, b or {}
+    return {
+        "total_tokens": a.get("total_tokens", 0) + b.get("total_tokens", 0),
+        "total_cost": a.get("total_cost", 0.0) + b.get("total_cost", 0.0),
+        "node_latencies": {**a.get("node_latencies", {}), **b.get("node_latencies", {})},
+        "node_token": {**a.get("node_token", {}), **b.get("node_token", {})},
+    }
+
 # ── Master BlogState ──────────────────────────────────────────────────────────
 
 class BlogState(TypedDict, total=False):
@@ -93,16 +107,16 @@ class BlogState(TypedDict, total=False):
     final_blog: str
 
     # Workflow control
-    status: str          # pending | planning | awaiting_approval | researching
-                         # writing | image_planning
-                         # image_searching | stitching | persisting | completed | error
-    current_node: str
+    status: Annotated[str, last_value]          # pending | planning | awaiting_approval | researching
+                                                # writing | image_planning
+                                                # image_searching | stitching | persisting | completed | error
+    current_node: Annotated[str, last_value]
     error_message: str
 
     # Human-in-the-loop flag: set to True after human approves/edits plan
     human_approved: bool
 
     # Observability
-    metrics: MetricsDict
+    metrics: Annotated[MetricsDict, merge_metrics]
     created_at: str   # ISO datetime string
-    updated_at: str
+    updated_at: Annotated[str, last_value]

@@ -62,11 +62,14 @@ def route_after_human(state: BlogState) -> str:
     return "router"
 
 
-def route_research(state: BlogState) -> str:
-    """Decide whether to run researcher or skip straight to writer."""
+def route_research(state: BlogState) -> list[str] | str:
+    """
+    If research is needed -> go to researcher first (it fans out afterwards).
+    Otherwise fan out directly into the two parallel branches.
+    """
     if state.get("research_required", False):
         return "researcher"
-    return "generate"
+    return ["generate", "image_planner"]   # parallel fan-out
 
 
 
@@ -82,7 +85,6 @@ async def router_node(state: BlogState) -> dict:
 def build_graph() -> StateGraph:
     graph = StateGraph(BlogState)
 
-    # Register nodes
     graph.add_node("planner", run_planner)
     graph.add_node("human_approval", human_approval_node)
     graph.add_node("router", router_node)
@@ -93,21 +95,31 @@ def build_graph() -> StateGraph:
     graph.add_node("stitch_blog", run_stitcher)
     graph.add_node("persist_state", run_persist)
 
-    # ── Edges ─────────────────────────────────────────────────────────────────
     graph.set_entry_point("planner")
     graph.add_edge("planner", "human_approval")
     graph.add_edge("human_approval", "router")
 
-    # After router: conditional — research or write
-    graph.add_conditional_edges("router", route_research, {
-        "researcher": "researcher",
-        "generate": "generate",
-    })
+    # Router: research first, or fan out directly
+    graph.add_conditional_edges(
+        "router",
+        route_research,
+        {
+            "researcher": "researcher",
+            "generate": "generate",
+            "image_planner": "image_planner",
+        },
+    )
 
+    # After research: fan out to both branches
     graph.add_edge("researcher", "generate")
-    graph.add_edge("generate", "image_planner")
+    graph.add_edge("researcher", "image_planner")
+
+    # Branch B: image pipeline
     graph.add_edge("image_planner", "image_search")
-    graph.add_edge("image_search", "stitch_blog")
+
+    # JOIN: stitcher runs ONCE, only after BOTH branches finish
+    graph.add_edge(["generate", "image_search"], "stitch_blog")
+
     graph.add_edge("stitch_blog", "persist_state")
     graph.add_edge("persist_state", LG_END)
 
