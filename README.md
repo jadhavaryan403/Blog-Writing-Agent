@@ -68,7 +68,7 @@ The user can view:
 
 # Workflow
 
-<img width="1300" height="1536" alt="Workflow architecture diagram" src="https://github.com/user-attachments/assets/5becf00d-645b-4c15-81a0-43af4d6ca456" />
+<img width="1536" height="1024" alt="Blog Generation Workflow Diagram" src="https://github.com/user-attachments/assets/64b45933-9145-4751-a4b7-caf3000aab4a" />
 
 ---
 
@@ -99,15 +99,13 @@ The user can view:
 
 ## Frontend
 
-- HTML
-- CSS
-- JavaScript
-
+- React
+- 
 
 ## Deployment
 
 - Render
-- PostgreSQL (Render Database)
+- PostgreSQL (Neon Database)
 
 ---
 
@@ -130,16 +128,17 @@ The user can view:
 
 # Webpage design
 
-<img width="1899" height="995" alt="Dashboard page" src="https://github.com/user-attachments/assets/475a2cdb-e645-43c4-8ece-3b20bfba461f" />
+<img width="1919" height="1027" alt="Dashboard Page" src="https://github.com/user-attachments/assets/bf132024-259a-4997-8f78-18cc21c57bf9" />
 
 
 
-<img width="1906" height="1016" alt="Blog page" src="https://github.com/user-attachments/assets/af12fb46-9de0-4026-966e-30417bbb0426" />
+<img width="1920" height="1032" alt="Blog View Page" src="https://github.com/user-attachments/assets/b28d4628-0831-43e4-8d0c-a57476079eed" />
 
 ---
 
 # Future Improvements
 
+- Caching blogs
 - Export blogs as PDF and Markdown
 - Support multiple LLM providers
 - Blog sharing and collaboration
@@ -151,6 +150,7 @@ The user can view:
 
 # Deployed link
 
-https://blog-writing-agent-j2ds.onrender.com
+Live_Demo(https://blog-writing-agent-1-y6mx.onrender.com/)
+This will take 30-40 sec to start the backend deployed on render.
 
 ---
